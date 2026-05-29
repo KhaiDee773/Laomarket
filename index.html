@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ຂາຍດີ - ຊື້ຂາຍອອນໄລນ໌ລາວ</title>
+<meta name="theme-color" content="#E8003D">
+<style>
+:root{--primary:#E8003D;--primary-dark:#B0002E;--primary-light:#FF4D6D;--secondary:#FF6B00;--gold:#FFD700;--bg:#F5F5F5;--white:#FFFFFF;--text:#1A1A1A;--text2:#555555;--text3:#999999;--border:#E0E0E0;--card:#FFFFFF;--success:#00C853;--warning:#FFB300;--info:#2196F3;--danger:#F44336;--radius:12px;--shadow:0 2px 12px rgba(0,0,0,0.08);--nav-h:60px;--header-h:56px;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:"Phetsarath OT","Noto Sans Lao","Noto Sans Thai",Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+button{cursor:pointer;border:none;background:none;font-family:inherit;}
+input,select,textarea{font-family:inherit;}
+a{text-decoration:none;color:inherit;}
+img{max-width:100%;}
+#splash{position:fixed;inset:0;background:var(--primary);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.5s;}
+#splash .logo-big{font-size:72px;font-weight:900;color:white;letter-spacing:-2px;text-shadow:0 4px 20px rgba(0,0,0,0.3);}
+#splash .logo-sub{color:rgba(255,255,255,0.85);font-size:16px;margin-top:8px;}
+#splash .dots{display:flex;gap:8px;margin-top:32px;}
+#splash .dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.5);animation:pulse 1.2s ease-in-out infinite;}
+#splash .dot:nth-child(2){animation-delay:0.2s;}
+#splash .dot:nth-child(3){animation-delay:0.4s;}
+@keyframes pulse{0%,100%{transform:scale(0.8);opacity:0.5}50%{transform:scale(1.2);opacity:1}}
+#app{display:none;flex-direction:column;min-height:100vh;}
+#app.active{display:flex;}
+.app-header{position:fixed;top:0;left:0;right:0;height:var(--header-h);background:var(--primary);display:flex;align-items:center;padding:0 12px;z-index:100;gap:8px;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+.header-logo{font-size:22px;font-weight:900;color:white;flex-shrink:0;}
+.header-search{flex:1;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.3);border-radius:20px;padding:7px 14px;color:white;font-size:14px;outline:none;transition:background 0.2s;}
+.header-search::placeholder{color:rgba(255,255,255,0.7);}
+.header-search:focus{background:rgba(255,255,255,0.25);}
+.header-btn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;color:white;font-size:20px;flex-shrink:0;transition:background 0.2s;}
+.notif-badge{position:relative;}
+.badge{position:absolute;top:4px;right:4px;background:var(--gold);color:var(--primary-dark);border-radius:50%;width:16px;height:16px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:white;border-top:1px solid var(--border);display:flex;z-index:100;box-shadow:0 -2px 10px rgba(0,0,0,0.08);}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--text3);font-size:11px;transition:color 0.2s;position:relative;}
+.nav-item.active{color:var(--primary);}
+.nav-item svg{width:24px;height:24px;}
+.nav-item .cart-badge{position:absolute;top:8px;right:calc(50% - 20px);background:var(--primary);color:white;border-radius:10px;padding:1px 5px;font-size:10px;font-weight:700;}
+.page{display:none;padding-top:calc(var(--header-h) + 44px);padding-bottom:calc(var(--nav-h) + 8px);min-height:100vh;}
+.page.active{display:block;}
+.lang-bar{display:flex;gap:6px;padding:8px 12px;background:white;border-bottom:1px solid var(--border);position:fixed;top:var(--header-h);left:0;right:0;z-index:99;}
+.lang-btn{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--border);color:var(--text3);cursor:pointer;}
+.lang-btn.active{background:var(--primary);color:white;border-color:var(--primary);}
+.version-tag{position:fixed;top:calc(var(--header-h)+4px);right:8px;background:rgba(0,0,0,0.6);color:white;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;z-index:90;pointer-events:none;}
+.banner-wrap{position:relative;overflow:hidden;}
+.banner-slider{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;}
+.banner-slider::-webkit-scrollbar{display:none;}
+.banner-slide{min-width:100%;scroll-snap-align:start;height:175px;display:flex;align-items:center;padding:20px;}
+.banner-slide.b1{background:linear-gradient(135deg,#E8003D 0%,#FF6B00 100%);}
+.banner-slide.b2{background:linear-gradient(135deg,#1a237e 0%,#283593 100%);}
+.banner-slide.b3{background:linear-gradient(135deg,#006400 0%,#228B22 100%);}
+.banner-text{color:white;z-index:1;}
+.banner-text h2{font-size:22px;font-weight:900;}
+.banner-text p{font-size:13px;opacity:0.9;margin-top:4px;}
+.banner-text .btn-shop{display:inline-block;margin-top:10px;background:white;color:var(--primary);padding:7px 18px;border-radius:20px;font-size:13px;font-weight:700;}
+.banner-dots{display:flex;justify-content:center;gap:6px;padding:8px 0 4px;}
+.banner-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:background 0.3s;}
+.banner-dot.active{background:var(--primary);width:20px;border-radius:4px;}
+.section{padding:12px;}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.section-title{font-size:15px;font-weight:700;}
+.see-all{font-size:13px;color:var(--primary);font-weight:600;}
+.cats{display:flex;overflow-x:auto;gap:8px;padding-bottom:4px;scrollbar-width:none;}
+.cats::-webkit-scrollbar{display:none;}
+.cat-item{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:68px;cursor:pointer;}
+.cat-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:var(--shadow);}
+.cat-name{font-size:11px;text-align:center;color:var(--text2);white-space:nowrap;}
+.flash-header{display:flex;align-items:center;gap:10px;}
+.flash-label{background:var(--primary);color:white;padding:4px 12px;border-radius:20px;font-size:14px;font-weight:700;}
+.flash-timer{display:flex;gap:4px;align-items:center;}
+.timer-box{background:var(--text);color:white;border-radius:4px;padding:2px 6px;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;}
+.products-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0 12px 12px;}
+.product-card{background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);position:relative;cursor:pointer;transition:transform 0.15s;}
+.product-card:active{transform:scale(0.97);}
+.product-img{width:100%;aspect-ratio:1;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:48px;position:relative;overflow:hidden;}
+.product-img img{width:100%;height:100%;object-fit:cover;}
+.product-badge{position:absolute;top:8px;left:8px;background:var(--primary);color:white;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;}
+.product-fav{position:absolute;top:8px;right:8px;width:30px;height:30px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 1px 4px rgba(0,0,0,0.2);}
+.product-info{padding:10px;}
+.product-name{font-size:13px;font-weight:600;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.product-price{font-size:15px;font-weight:900;color:var(--primary);margin-top:4px;}
+.product-old-price{font-size:12px;color:var(--text3);text-decoration:line-through;margin-left:4px;}
+.product-meta{display:flex;align-items:center;gap:4px;margin-top:4px;}
+.stars{color:var(--gold);font-size:12px;}
+.rating-count{font-size:11px;color:var(--text3);}
+.sold-count{font-size:11px;color:var(--text3);margin-left:auto;}
+.add-cart-btn{width:100%;padding:8px;background:var(--primary);color:white;border-radius:0 0 var(--radius) var(--radius);font-size:13px;font-weight:700;margin-top:8px;transition:background 0.2s;}
+#product-detail{position:fixed;inset:0;background:var(--bg);z-index:200;transform:translateX(100%);transition:transform 0.3s ease;overflow-y:auto;padding-bottom:80px;}
+#product-detail.open{transform:translateX(0);}
+.detail-header{position:sticky;top:0;background:white;display:flex;align-items:center;padding:12px;gap:10px;z-index:10;border-bottom:1px solid var(--border);}
+.back-btn{width:36px;height:36px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:20px;}
+.detail-main-img{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:80px;background:#f8f8f8;}
+.detail-main-img img{width:100%;height:100%;object-fit:cover;}
+.detail-body{padding:16px;background:white;margin-top:8px;}
+.detail-price-row{display:flex;align-items:baseline;gap:10px;}
+.detail-price{font-size:26px;font-weight:900;color:var(--primary);}
+.detail-oldprice{font-size:16px;color:var(--text3);text-decoration:line-through;}
+.detail-discount{background:var(--primary);color:white;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:700;}
+.detail-name{font-size:17px;font-weight:700;margin:10px 0 6px;line-height:1.4;}
+.detail-rating{display:flex;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:10px 0;}
+.detail-section{margin:12px 0;}
+.detail-section-title{font-size:14px;font-weight:700;margin-bottom:8px;}
+.variant-options{display:flex;flex-wrap:wrap;gap:8px;}
+.variant-btn{padding:6px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;cursor:pointer;}
+.variant-btn.active{border-color:var(--primary);color:var(--primary);background:rgba(232,0,61,0.06);}
+.qty-row{display:flex;align-items:center;gap:12px;}
+.qty-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);font-size:20px;display:flex;align-items:center;justify-content:center;font-weight:700;}
+.qty-val{font-size:18px;font-weight:700;min-width:30px;text-align:center;}
+.detail-actions{position:fixed;bottom:0;left:0;right:0;padding:12px;background:white;border-top:1px solid var(--border);display:flex;gap:10px;}
+.btn-cart{flex:1;padding:14px;border:2px solid var(--primary);border-radius:var(--radius);color:var(--primary);font-weight:700;font-size:15px;background:white;}
+.btn-buy{flex:2;padding:14px;background:var(--primary);border-radius:var(--radius);color:white;font-weight:700;font-size:15px;}
+.review-item{padding:12px 0;border-bottom:1px solid var(--border);}
+.review-user{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.review-avatar{width:32px;height:32px;border-radius:50%;background:var(--primary);color:white;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;}
+.cart-item{background:white;border-radius:var(--radius);padding:12px;margin-bottom:10px;display:flex;gap:12px;box-shadow:var(--shadow);}
+.cart-img{width:80px;height:80px;border-radius:10px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0;overflow:hidden;}
+.cart-img img{width:100%;height:100%;object-fit:cover;}
+.cart-info{flex:1;}
+.cart-name{font-size:14px;font-weight:600;line-height:1.4;}
+.cart-price{font-size:16px;font-weight:900;color:var(--primary);}
+.cart-qty-row{display:flex;align-items:center;gap:8px;margin-top:6px;}
+.cart-qty-btn{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);font-size:16px;display:flex;align-items:center;justify-content:center;}
+.cart-qty-val{font-size:15px;font-weight:700;min-width:24px;text-align:center;}
+.cart-delete{margin-left:auto;color:var(--danger);font-size:20px;padding:4px;}
+.cart-summary{background:white;border-radius:var(--radius);padding:16px;margin:10px 12px;box-shadow:var(--shadow);}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:14px;}
+.summary-row.total{font-size:16px;font-weight:700;border-top:1px solid var(--border);margin-top:6px;padding-top:10px;}
+.summary-row.total .val{color:var(--primary);font-size:20px;}
+.checkout-btn{display:block;width:calc(100% - 24px);margin:0 12px 12px;padding:16px;background:var(--primary);color:white;border-radius:var(--radius);font-size:16px;font-weight:700;text-align:center;}
+.coupon-row{display:flex;gap:8px;padding:0 12px 12px;}
+.coupon-input{flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:14px;outline:none;}
+.coupon-input:focus{border-color:var(--primary);}
+.coupon-btn{padding:10px 16px;background:var(--secondary);color:white;border-radius:var(--radius);font-size:14px;font-weight:700;}
+.profile-top{background:white;padding:20px 16px 16px;position:relative;}
+.profile-cover{width:calc(100% + 32px);height:120px;border-radius:var(--radius) var(--radius) 0 0;background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%);position:relative;overflow:hidden;margin:-20px -16px 0;}
+.cover-edit{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.5);color:white;border-radius:20px;padding:4px 10px;font-size:12px;cursor:pointer;}
+.profile-avatar-wrap{position:relative;display:inline-block;margin-top:-40px;}
+.profile-avatar{width:80px;height:80px;border-radius:50%;border:3px solid white;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:white;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.2);}
+.profile-avatar img{width:100%;height:100%;object-fit:cover;}
+.avatar-edit{position:absolute;bottom:0;right:0;width:26px;height:26px;background:var(--primary);border-radius:50%;border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:13px;color:white;cursor:pointer;}
+.profile-name{font-size:18px;font-weight:700;margin-top:10px;}
+.profile-email{font-size:13px;color:var(--text3);margin-top:2px;}
+.profile-stats{display:flex;border-top:1px solid var(--border);margin:16px 0 0;}
+.pstat{flex:1;text-align:center;padding:12px 0;border-right:1px solid var(--border);}
+.pstat:last-child{border-right:none;}
+.pstat-val{font-size:18px;font-weight:700;color:var(--primary);}
+.pstat-lab{font-size:12px;color:var(--text3);margin-top:2px;}
+.wallet-card{background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);border-radius:var(--radius);padding:20px;margin:12px;color:white;position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(232,0,61,0.3);}
+.wallet-label{font-size:13px;opacity:0.9;}
+.wallet-balance{font-size:32px;font-weight:900;margin:8px 0;}
+.wallet-actions{display:flex;gap:10px;margin-top:16px;}
+.wallet-btn{flex:1;padding:10px;background:rgba(255,255,255,0.2);border-radius:10px;color:white;font-size:13px;font-weight:600;text-align:center;border:1px solid rgba(255,255,255,0.3);cursor:pointer;}
+.menu-list{background:white;border-radius:var(--radius);margin:12px;overflow:hidden;box-shadow:var(--shadow);}
+.menu-item{display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);gap:14px;cursor:pointer;transition:background 0.15s;}
+.menu-item:last-child{border-bottom:none;}
+.menu-item:active{background:var(--bg);}
+.menu-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.menu-text{flex:1;}
+.menu-title{font-size:14px;font-weight:600;}
+.menu-sub{font-size:12px;color:var(--text3);margin-top:2px;}
+.menu-arrow{color:var(--text3);font-size:18px;}
+#auth-modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;display:none;align-items:flex-end;justify-content:center;}
+#auth-modal.open{display:flex;}
+.auth-sheet{background:white;border-radius:20px 20px 0 0;padding:24px;width:100%;max-height:90vh;overflow-y:auto;animation:slideUp 0.3s ease;}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.auth-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;}
+.auth-title{font-size:22px;font-weight:800;margin-bottom:6px;}
+.auth-sub{font-size:14px;color:var(--text3);margin-bottom:20px;}
+.auth-tabs{display:flex;margin-bottom:20px;border-bottom:2px solid var(--border);}
+.auth-tab{flex:1;padding:10px;text-align:center;font-size:15px;font-weight:600;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;}
+.auth-tab.active{color:var(--primary);border-bottom-color:var(--primary);}
+.form-group{margin-bottom:14px;}
+.form-label{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px;display:block;}
+.form-input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:15px;outline:none;transition:border-color 0.2s;background:white;}
+.form-input:focus{border-color:var(--primary);}
+.form-btn{width:100%;padding:14px;background:var(--primary);color:white;border-radius:var(--radius);font-size:16px;font-weight:700;margin-top:8px;}
+.otp-row{display:flex;gap:8px;}
+.otp-input{flex:1;text-align:center;padding:14px 4px;border:1.5px solid var(--border);border-radius:10px;font-size:20px;font-weight:700;outline:none;}
+.otp-input:focus{border-color:var(--primary);}
+.close-auth{position:absolute;top:16px;right:16px;width:32px;height:32px;background:var(--bg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;}
+#admin-modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:none;align-items:center;justify-content:center;}
+#admin-modal.open{display:flex;}
+.admin-login-box{background:white;border-radius:var(--radius);padding:28px 24px;width:300px;text-align:center;}
+#admin-panel{position:fixed;inset:0;background:#1a1a2e;z-index:500;display:none;flex-direction:column;overflow:hidden;}
+#admin-panel.open{display:flex;}
+.admin-header{background:#16213e;padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,0.1);}
+.admin-header-title{font-size:18px;font-weight:800;color:white;flex:1;}
+.admin-tabs{display:flex;overflow-x:auto;background:#0f3460;scrollbar-width:none;}
+.admin-tabs::-webkit-scrollbar{display:none;}
+.admin-tab{padding:12px 16px;color:rgba(255,255,255,0.6);font-size:13px;font-weight:600;white-space:nowrap;border-bottom:2px solid transparent;cursor:pointer;}
+.admin-tab.active{color:white;border-bottom-color:var(--primary);}
+.admin-content{flex:1;overflow-y:auto;padding:16px;background:#1a1a2e;}
+.admin-card{background:#16213e;border-radius:var(--radius);padding:16px;margin-bottom:12px;border:1px solid rgba(255,255,255,0.08);}
+.admin-card-title{font-size:14px;font-weight:700;color:rgba(255,255,255,0.9);margin-bottom:12px;}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;}
+.stat-box{background:rgba(255,255,255,0.05);border-radius:10px;padding:14px;text-align:center;}
+.stat-box-val{font-size:22px;font-weight:800;color:white;}
+.stat-box-lab{font-size:12px;color:rgba(255,255,255,0.5);margin-top:4px;}
+.admin-btn{padding:10px 18px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;}
+.admin-btn-primary{background:var(--primary);color:white;}
+.admin-btn-success{background:var(--success);color:white;}
+.admin-btn-warning{background:var(--warning);color:var(--text);}
+.admin-input{width:100%;padding:10px 12px;border:1.5px solid rgba(255,255,255,0.15);border-radius:8px;background:rgba(255,255,255,0.05);color:white;font-size:14px;outline:none;margin-bottom:10px;}
+.admin-input:focus{border-color:var(--primary);}
+.admin-input::placeholder{color:rgba(255,255,255,0.3);}
+.user-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.08);}
+.user-avatar-sm{width:36px;height:36px;border-radius:50%;background:var(--primary);color:white;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;}
+.status-badge{padding:3px 8px;border-radius:10px;font-size:11px;font-weight:700;}
+.badge-green{background:rgba(0,200,83,0.2);color:#00e676;}
+.badge-yellow{background:rgba(255,179,0,0.2);color:#ffcc02;}
+.badge-red{background:rgba(244,67,54,0.2);color:#ff5252;}
+.color-opt{width:36px;height:36px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:transform 0.2s;}
+.color-opt.selected,.color-opt:hover{border-color:white;transform:scale(1.15);}
+.version-card{display:flex;align-items:center;gap:10px;padding:12px;background:rgba(255,255,255,0.05);border-radius:10px;margin-bottom:8px;cursor:pointer;border:2px solid transparent;}
+.version-card.active{border-color:var(--primary);}
+.version-preview{width:50px;height:30px;border-radius:6px;flex-shrink:0;}
+#wallet-page{position:fixed;inset:0;background:var(--bg);z-index:200;transform:translateX(100%);transition:transform 0.3s ease;overflow-y:auto;}
+#wallet-page.open{transform:translateX(0);}
+.wallet-full{background:linear-gradient(160deg,var(--primary) 0%,var(--primary-dark) 100%);padding:60px 20px 30px;color:white;}
+.wallet-bal-big{font-size:42px;font-weight:900;margin:8px 0;}
+.wallet-actions-row{display:flex;gap:12px;margin-top:24px;}
+.w-action-btn{flex:1;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:12px;padding:14px 8px;text-align:center;color:white;cursor:pointer;}
+.w-action-icon{font-size:24px;margin-bottom:6px;}
+.txn-list{padding:16px;}
+.txn-item{background:white;border-radius:var(--radius);padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);}
+.txn-icon{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.txn-info{flex:1;}
+.txn-title{font-size:14px;font-weight:600;}
+.txn-date{font-size:12px;color:var(--text3);margin-top:2px;}
+.txn-amount{font-size:16px;font-weight:700;}
+.txn-amount.in{color:var(--success);}
+.txn-amount.out{color:var(--danger);}
+#topup-modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:400;display:none;align-items:flex-end;}
+#topup-modal.open{display:flex;}
+.topup-sheet{background:white;border-radius:20px 20px 0 0;padding:24px;width:100%;max-height:85vh;overflow-y:auto;animation:slideUp 0.3s ease;}
+.bank-list{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0;}
+.bank-item{background:var(--bg);border-radius:10px;padding:10px 6px;text-align:center;cursor:pointer;border:2px solid transparent;}
+.bank-item.selected{border-color:var(--primary);background:rgba(232,0,61,0.05);}
+.bank-icon{font-size:28px;margin-bottom:4px;}
+.bank-name{font-size:11px;font-weight:600;color:var(--text2);}
+.slip-upload{border:2px dashed var(--border);border-radius:var(--radius);padding:30px;text-align:center;cursor:pointer;display:block;}
+.slip-preview{max-width:100%;border-radius:var(--radius);margin-top:12px;display:none;}
+#order-page{position:fixed;inset:0;background:var(--bg);z-index:200;transform:translateX(100%);transition:transform 0.3s;overflow-y:auto;padding-bottom:80px;}
+#order-page.open{transform:translateX(0);}
+.order-card{background:white;border-radius:var(--radius);padding:16px;margin:10px 12px;box-shadow:var(--shadow);}
+.order-status{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;}
+.status-pending{background:rgba(255,179,0,0.15);color:var(--warning);}
+.status-shipping{background:rgba(33,150,243,0.15);color:var(--info);}
+.status-delivered{background:rgba(0,200,83,0.15);color:var(--success);}
+.delivery-track{background:var(--bg);border-radius:var(--radius);padding:14px;margin-top:12px;}
+.track-step{display:flex;gap:12px;margin-bottom:14px;position:relative;}
+.track-step:not(:last-child)::after{content:"";position:absolute;left:15px;top:30px;width:2px;height:calc(100% - 10px);background:var(--border);}
+.track-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.track-dot.done{background:var(--success);}
+.track-dot.active{background:var(--primary);}
+.track-dot.pending{background:var(--border);}
+.track-info{flex:1;padding-top:6px;}
+.track-title{font-size:13px;font-weight:600;}
+.track-time{font-size:12px;color:var(--text3);}
+.shipping-option{display:flex;align-items:center;gap:12px;padding:12px;border:1.5px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;}
+.shipping-option.selected{border-color:var(--primary);background:rgba(232,0,61,0.03);}
+.shipping-logo{width:48px;height:48px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;}
+.shipping-name{font-size:14px;font-weight:700;}
+.shipping-desc{font-size:12px;color:var(--text3);}
+.shipping-price{font-size:14px;font-weight:700;color:var(--primary);}
+#checkout-page{position:fixed;inset:0;background:var(--bg);z-index:250;transform:translateX(100%);transition:transform 0.3s;overflow-y:auto;padding-bottom:80px;}
+#checkout-page.open{transform:translateX(0);}
+.province-select{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:14px;background:white;outline:none;cursor:pointer;}
+.province-select:focus{border-color:var(--primary);}
+#notif-panel{position:fixed;top:0;right:-100%;width:100%;max-width:400px;height:100%;background:white;z-index:300;transition:right 0.3s;box-shadow:-4px 0 20px rgba(0,0,0,0.15);overflow-y:auto;}
+#notif-panel.open{right:0;}
+.notif-header{padding:16px;background:var(--primary);color:white;display:flex;align-items:center;gap:12px;}
+.notif-item{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;gap:12px;cursor:pointer;}
+.notif-item.unread{background:rgba(232,0,61,0.04);}
+.notif-icon-wrap{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.notif-text{font-size:14px;line-height:1.5;}
+.notif-time{font-size:12px;color:var(--text3);margin-top:3px;}
+.unread-dot{width:8px;height:8px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:6px;}
+#seller-modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:350;display:none;align-items:flex-end;}
+#seller-modal.open{display:flex;}
+.seller-sheet{background:white;border-radius:20px 20px 0 0;padding:24px;width:100%;max-height:90vh;overflow-y:auto;animation:slideUp 0.3s ease;}
+#search-results{position:fixed;top:var(--header-h);left:0;right:0;background:white;z-index:150;max-height:60vh;overflow-y:auto;box-shadow:0 4px 20px rgba(0,0,0,0.1);display:none;}
+#search-results.open{display:block;}
+.search-result-item{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;cursor:pointer;}
+.search-result-img{width:44px;height:44px;border-radius:8px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.search-result-name{font-size:14px;font-weight:600;}
+.search-result-price{font-size:13px;color:var(--primary);font-weight:700;}
+.page-header{padding:14px 16px;background:white;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);margin-bottom:8px;}
+.page-title{font-size:17px;font-weight:700;flex:1;}
+.section-bg{background:white;margin-bottom:8px;}
+.empty-state{text-align:center;padding:60px 20px;}
+.empty-icon{font-size:64px;margin-bottom:16px;}
+.empty-title{font-size:18px;font-weight:700;margin-bottom:8px;}
+.empty-sub{font-size:14px;color:var(--text3);}
+.loading-spinner{display:flex;justify-content:center;padding:40px;}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.stock-bar{width:100%;height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:6px;}
+.stock-fill{height:100%;background:var(--primary);border-radius:2px;}
+.chart-bars{display:flex;align-items:flex-end;gap:6px;height:100px;padding:0 4px;}
+.chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.chart-bar{width:100%;background:var(--primary);border-radius:4px 4px 0 0;transition:height 0.3s;min-height:4px;}
+.chart-month{font-size:10px;color:rgba(255,255,255,0.5);}
+#toast{position:fixed;bottom:calc(var(--nav-h) + 16px);left:50%;transform:translateX(-50%) translateY(20px);background:rgba(0,0,0,0.85);color:white;padding:10px 20px;border-radius:20px;font-size:14px;z-index:9999;opacity:0;transition:all 0.3s;white-space:nowrap;pointer-events:none;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div id="splash">
+  <div class="logo-big" id="splash-logo">ຂາຍດີ</div>
+  <div class="logo-sub">ຊື້ຂາຍອອນໄລນ໌ #1 ລາວ</div>
+  <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+</div>
+<div class="version-tag" id="version-tag">v1.0</div>
+<div id="app">
+  <header class="app-header">
+    <div class="header-logo" id="app-logo-text">ຂາຍດີ</div>
+    <input class="header-search" id="header-search" placeholder="🔍 ຄົ້ນຫາສິນຄ້າ..." autocomplete="off">
+    <button class="header-btn notif-badge" onclick="openNotif()">🔔<span class="badge" id="notif-count">3</span></button>
+  </header>
+  <div id="search-results"></div>
+  <div class="lang-bar">
+    <button class="lang-btn" id="lang-lo" onclick="setLang('lo')">ລາວ</button>
+    <button class="lang-btn" id="lang-th" onclick="setLang('th')">ไทย</button>
+    <button class="lang-btn" id="lang-en" onclick="setLang('en')">EN</button>
+  </div>
+  <div class="page active" id="page-home" style="padding-top:calc(var(--header-h) + 44px);">
+    <div class="banner-wrap section-bg">
+      <div class="banner-slider" id="banner-slider">
+        <div class="banner-slide b1"><div class="banner-text"><h2>ສິນຄ້າໃໝ່ ລາຄາດີ</h2><p>ຊ້ອບໄດ້ທຸກວັນ 24/7</p><span class="btn-shop">ເລີ່ມຊ້ອບ</span></div></div>
+        <div class="banner-slide b2"><div class="banner-text"><h2>Flash Sale 50%</h2><p>ສ່ວນຫຼຸດພິເສດ ມື້ນີ້ເທົ່ານັ້ນ</p><span class="btn-shop" onclick="scrollToFlash()">ເບິ່ງດຽວນີ້</span></div></div>
+        <div class="banner-slide b3"><div class="banner-text"><h2>ຈັດສົ່ງທົ່ວລາວ</h2><p>ຮ້ານຄ້າ 100+ ຮ້ານ</p><span class="btn-shop" onclick="openSellerModal()">ເຂົ້າຮ່ວມຂາຍ</span></div></div>
+      </div>
+      <div class="banner-dots" id="banner-dots"><div class="banner-dot active"></div><div class="banner-dot"></div><div class="banner-dot"></div></div>
+    </div>
+    <div class="section section-bg">
+      <div class="section-header"><span class="section-title" id="cat-title">ໝວດໝູ່ສິນຄ້າ</span><span class="see-all" onclick="navTo('products')">ທັງໝົດ ›</span></div>
+      <div class="cats" id="cats-container"></div>
+    </div>
+    <div class="section section-bg" id="flash-section">
+      <div class="section-header">
+        <div class="flash-header"><span class="flash-label">⚡ Flash Sale</span>
+          <div class="flash-timer"><div class="timer-box" id="timer-h">02</div>:<div class="timer-box" id="timer-m">15</div>:<div class="timer-box" id="timer-s">30</div></div>
+        </div>
+      </div>
+      <div class="products-grid" id="flash-products"></div>
+    </div>
+    <div class="section section-bg">
+      <div class="section-header"><span class="section-title" id="prod-title">ສິນຄ້າທັງໝົດ</span><span class="see-all" onclick="navTo('products')">ທັງໝົດ ›</span></div>
+      <div class="products-grid" id="all-products"></div>
+    </div>
+  </div>
+  <div class="page" id="page-products">
+    <div class="page-header"><span class="page-title" id="prods-page-title">ສິນຄ້າ</span></div>
+    <div style="padding:0 12px 8px;"><div class="cats" id="cats-filter" style="margin-bottom:12px;"></div></div>
+    <div class="products-grid" id="page-products-grid"></div>
+  </div>
+  <div class="page" id="page-cart">
+    <div class="page-header"><span class="page-title">🛒 <span id="cart-title">ກະຕ່າສິນຄ້າ</span></span></div>
+    <div id="cart-items" style="padding:0 12px;"></div>
+    <div class="coupon-row">
+      <input class="coupon-input" id="coupon-input" placeholder="ລະຫັດສ່ວນຫຼຸດ...">
+      <button class="coupon-btn" onclick="applyCoupon()">ໃຊ້</button>
+    </div>
+    <div class="cart-summary" id="cart-summary"></div>
+    <button class="checkout-btn" onclick="openCheckout()">ສັ່ງຊື້ດຽວນີ້</button>
+  </div>
+  <div class="page" id="page-profile"><div id="profile-content"></div></div>
+  <nav class="bottom-nav">
+    <button class="nav-item active" id="nav-home" onclick="navTo('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+      <span id="nav-home-label">ໜ້າຫຼັກ</span>
+    </button>
+    <button class="nav-item" id="nav-products" onclick="navTo('products')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+      <span id="nav-products-label">ສິນຄ້າ</span>
+    </button>
+    <button class="nav-item" id="nav-cart" onclick="navTo('cart')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.98 1.61h9.72a2 2 0 001.98-1.72l1.18-8.37H6"/></svg>
+      <span id="nav-cart-label">ກະຕ່າ</span>
+      <span class="cart-badge" id="cart-count" style="display:none">0</span>
+    </button>
+    <button class="nav-item" id="nav-profile" onclick="navTo('profile')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span id="nav-profile-label">ໂປຣໄຟລ໌</span>
+    </button>
+  </nav>
+</div>
+
+<div id="product-detail">
+  <div class="detail-header">
+    <button class="back-btn" onclick="closeDetail()">←</button>
+    <span style="font-size:16px;font-weight:700;flex:1;">ລາຍລະອຽດສິນຄ້າ</span>
+    <button style="font-size:22px;padding:4px;" onclick="shareProduct()">📤</button>
+  </div>
+  <div id="detail-content"></div>
+  <div class="detail-actions" id="detail-actions"></div>
+</div>
+
+<div id="wallet-page">
+  <div class="detail-header">
+    <button class="back-btn" onclick="closeWallet()">←</button>
+    <span style="font-size:16px;font-weight:700;">ກະເປົ໋າເງິນ</span>
+  </div>
+  <div id="wallet-content"></div>
+</div>
+
+<div id="order-page">
+  <div class="detail-header">
+    <button class="back-btn" onclick="closeOrderPage()">←</button>
+    <span style="font-size:16px;font-weight:700;flex:1;">ຄໍາສັ່ງຊື້</span>
+  </div>
+  <div id="order-content"></div>
+</div>
+
+<div id="checkout-page">
+  <div class="detail-header">
+    <button class="back-btn" onclick="closeCheckout()">←</button>
+    <span style="font-size:16px;font-weight:700;flex:1;">ຂໍ້ມູນການຈັດສົ່ງ</span>
+  </div>
+  <div id="checkout-content"></div>
+</div>
+
+<div id="auth-modal">
+  <div style="position:relative;width:100%">
+    <button class="close-auth" onclick="closeAuth()">✕</button>
+    <div class="auth-sheet"><div class="auth-handle"></div><div id="auth-content"></div></div>
+  </div>
+</div>
+
+<div id="admin-modal">
+  <div class="admin-login-box">
+    <div style="font-size:40px;margin-bottom:12px;">🔐</div>
+    <div style="font-size:18px;font-weight:800;color:var(--primary);margin-bottom:6px;">ແອດມິນ ຫຼັງບ້ານ</div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">ແຕະໂປຣໄຟລ໌ 3 ຄັ້ງ ເພື່ອເຂົ້າ</div>
+    <input type="password" id="admin-pw-input" class="form-input" placeholder="ລະຫັດແອດມິນ" style="margin-bottom:12px;" onkeydown="if(event.key==='Enter')checkAdmin()">
+    <button class="form-btn" onclick="checkAdmin()">ເຂົ້າສູ່ລະບົບ</button>
+    <button style="margin-top:12px;color:var(--text3);font-size:14px;display:block;width:100%;" onclick="closeAdminModal()">ຍົກເລີກ</button>
+  </div>
+</div>
+
+<div id="admin-panel">
+  <div class="admin-header">
+    <span style="font-size:22px;">🛡️</span>
+    <span class="admin-header-title">ຂາຍດີ Admin Panel</span>
+    <button style="color:rgba(255,255,255,0.7);font-size:24px;padding:4px;" onclick="closeAdminPanel()">✕</button>
+  </div>
+  <div class="admin-tabs" id="admin-tabs-bar">
+    <div class="admin-tab active" onclick="adminTab('dashboard')">📊 Dashboard</div>
+    <div class="admin-tab" onclick="adminTab('products')">📦 ສິນຄ້າ</div>
+    <div class="admin-tab" onclick="adminTab('orders')">🧾 ຄໍາສັ່ງ</div>
+    <div class="admin-tab" onclick="adminTab('users')">👥 ຜູ້ໃຊ້</div>
+    <div class="admin-tab" onclick="adminTab('topup')">💰 ເຕີມເງິນ</div>
+    <div class="admin-tab" onclick="adminTab('withdraw')">💸 ຖອນເງິນ</div>
+    <div class="admin-tab" onclick="adminTab('shipping')">🚚 ຂົນສົ່ງ</div>
+    <div class="admin-tab" onclick="adminTab('theme')">🎨 ຫນ້າຕາ</div>
+    <div class="admin-tab" onclick="adminTab('coupons')">🎟️ ຄູປ໋ອງ</div>
+    <div class="admin-tab" onclick="adminTab('cats')">🗂️ ໝວດໝູ່</div>
+  </div>
+  <div class="admin-content" id="admin-content"></div>
+</div>
+
+<div id="topup-modal">
+  <div class="topup-sheet">
+    <div style="font-size:18px;font-weight:800;margin-bottom:6px;">💰 ເຕີມເງິນ</div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:14px;">ເລືອກທະນາຄານ ແລະ ອັບໂຫຼດສລິບ</div>
+    <div class="bank-list" id="bank-list"></div>
+    <div class="form-group"><label class="form-label">ຈໍານວນ (ກີບ)</label><input type="number" class="form-input" id="topup-amount" placeholder="ເຊັ່ນ: 500000"></div>
+    <div class="form-group">
+      <label class="form-label">ອັບໂຫຼດສລິບ (ຮູບຈິງເທົ່ານັ້ນ)</label>
+      <label class="slip-upload" for="slip-file">
+        <div style="font-size:36px;">📷</div>
+        <div style="font-size:14px;color:var(--text3);margin-top:8px;">ແຕະເພື່ອອັບໂຫຼດສລິບ</div>
+        <img id="slip-preview" class="slip-preview">
+      </label>
+      <input type="file" id="slip-file" accept="image/*" style="display:none" onchange="previewSlip(this)">
+    </div>
+    <button class="form-btn" onclick="submitTopup()">ສົ່ງຂໍ້ມູນ</button>
+    <button onclick="closeTopup()" style="width:100%;padding:12px;color:var(--text3);font-size:14px;margin-top:8px;">ຍົກເລີກ</button>
+  </div>
+</div>
+
+<div id="seller-modal">
+  <div class="seller-sheet">
+    <div style="font-size:18px;font-weight:800;margin-bottom:4px;">🏪 ສະໝັກຜູ້ຂາຍ</div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">ກາຍເປັນຜູ້ຂາຍໃນ ຂາຍດີ ໄດ້ເລີຍ</div>
+    <div class="form-group"><label class="form-label">ຊື່ຮ້ານ</label><input class="form-input" id="seller-shop-name" placeholder="ຊື່ຮ້ານ"></div>
+    <div class="form-group"><label class="form-label">ໝວດໝູ່</label>
+      <select class="province-select" id="seller-category">
+        <option>ເລືອກໝວດໝູ່</option><option>ອີເລັກໂທຣນິກ</option><option>ເສື້ອຜ້າ</option>
+        <option>ຍານພາຫະນະ</option><option>ອາຫານ</option><option>ເຄື່ອງສໍາອາງ</option><option>ສິນຄ້າທົ່ວໄປ</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">ເບີໂທ</label><input class="form-input" id="seller-phone" placeholder="020xxxxxxxx" type="tel"></div>
+    <div class="form-group"><label class="form-label">ທີ່ຢູ່</label><input class="form-input" id="seller-address" placeholder="ທີ່ຢູ່ຮ້ານ"></div>
+    <div class="form-group"><label class="form-label">ບັນຊີທະນາຄານ</label><input class="form-input" id="seller-bank" placeholder="ທະນາຄານ - ເລກບັນຊີ"></div>
+    <button class="form-btn" onclick="submitSellerApp()">ສົ່ງຄໍາຮ້ອງ</button>
+    <button onclick="closeSellerModal()" style="width:100%;padding:12px;color:var(--text3);font-size:14px;margin-top:8px;">ຍົກເລີກ</button>
+  </div>
+</div>
+
+<div id="notif-panel">
+  <div class="notif-header">
+    <button onclick="closeNotif()" style="color:white;font-size:22px;">←</button>
+    <span style="font-size:17px;font-weight:700;flex:1;">ການແຈ້ງເຕືອນ</span>
+    <button style="color:rgba(255,255,255,0.8);font-size:13px;" onclick="markAllRead()">ອ່ານທັງໝົດ</button>
+  </div>
+  <div id="notif-list"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SB='https://gvwhutdzfjrzysjyoanm.supabase.co';
+const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2d2h1dGR6ZmpyenlzanlvYW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTMwMzQsImV4cCI6MjA5NTUyOTAzNH0.IPA4nYbaL07V7GlqTSJcvO9xiwtNX4e3HyMw7d4L9k4';
+const H={'apikey':SK,'Authorization':'Bearer '+SK,'Content-Type':'application/json'};
+async function sbQ(t,p=''){try{const r=await fetch(SB+'/rest/v1/'+t+p,{headers:H});return await r.json();}catch(e){return[];}}
+async function sbIns(t,d){try{const r=await fetch(SB+'/rest/v1/'+t,{method:'POST',headers:{...H,'Prefer':'return=representation'},body:JSON.stringify(d)});return await r.json();}catch(e){return null;}}
+async function sbUpd(t,id,d){try{const r=await fetch(SB+'/rest/v1/'+t+'?id=eq.'+id,{method:'PATCH',headers:H,body:JSON.stringify(d)});return r.ok;}catch(e){return false;}}
+async function sbDel(t,id){try{const r=await fetch(SB+'/rest/v1/'+t+'?id=eq.'+id,{method:'DELETE',headers:H});return r.ok;}catch(e){return false;}}
+async function sbAuth(a,e,p){try{const r=await fetch(SB+'/auth/v1/'+a,{method:'POST',headers:{apikey:SK,'Content-Type':'application/json'},body:JSON.stringify({email:e,password:p})});return await r.json();}catch(e){return null;}}
+async function sbUpload(bucket,path,file){try{const r=await fetch(SB+'/storage/v1/object/'+bucket+'/'+path,{method:'POST',headers:{apikey:SK,'Authorization':'Bearer '+SK},body:file});return r.ok?SB+'/storage/v1/object/public/'+bucket+'/'+path:null;}catch(e){return null;}}
+
+let user=null,cart=JSON.parse(localStorage.getItem('kd_cart')||'[]'),lang=localStorage.getItem('kd_lang')||'lo';
+let products=[],cats=[],theme={primary:'#E8003D',version:'v1.0',logo:'ຂາຍດີ'};
+let adminTaps=0,adminTimer=null,selShipping=null,selBank='',detailQty=1,regData={};
+
+const T={
+  lo:{home:'ໜ້າຫຼັກ',products:'ສິນຄ້າ',cart:'ກະຕ່າ',profile:'ໂປຣໄຟລ໌',search:'ຄົ້ນຫາສິນຄ້າ...',catTitle:'ໝວດໝູ່',prodTitle:'ສິນຄ້າທັງໝົດ',addCart:'ໃສ່ກະຕ່າ',buyNow:'ຊື້ດຽວນີ້',added:'ເພີ່ມໃນກະຕ່າ!',login:'ເຂົ້າສູ່ລະບົບ',reg:'ສະໝັກ',logout:'ອອກ',wallet:'ກະເປົ໋າ',orders:'ຄໍາສັ່ງ',seller:'ຜູ້ຂາຍ',total:'ລວມ',shipping:'ຂົນສົ່ງ',order_ok:'ສັ່ງຊື້ສໍາເລັດ!',hi:'ສະບາຍດີ',guest:'ແຂກ',empty_cart:'ກະຕ່າຫວ່າງ',place_order:'ຢືນຢັນຄໍາສັ່ງ',province:'ແຂວງ',district:'ເມືອງ',village:'ບ້ານ',name:'ຊື່',phone:'ເບີໂທ'},
+  th:{home:'หน้าหลัก',products:'สินค้า',cart:'ตะกร้า',profile:'โปรไฟล์',search:'ค้นหาสินค้า...',catTitle:'หมวดหมู่',prodTitle:'สินค้าทั้งหมด',addCart:'ใส่ตะกร้า',buyNow:'ซื้อเลย',added:'เพิ่มแล้ว!',login:'เข้าสู่ระบบ',reg:'สมัคร',logout:'ออก',wallet:'กระเป๋า',orders:'คำสั่งซื้อ',seller:'ผู้ขาย',total:'รวม',shipping:'จัดส่ง',order_ok:'สั่งซื้อสำเร็จ!',hi:'สวัสดี',guest:'แขก',empty_cart:'ตะกร้าว่าง',place_order:'ยืนยัน',province:'จังหวัด',district:'อำเภอ',village:'หมู่บ้าน',name:'ชื่อ',phone:'เบอร์'},
+  en:{home:'Home',products:'Products',cart:'Cart',profile:'Profile',search:'Search...',catTitle:'Categories',prodTitle:'All Products',addCart:'Add to Cart',buyNow:'Buy Now',added:'Added!',login:'Login',reg:'Register',logout:'Logout',wallet:'Wallet',orders:'Orders',seller:'Seller',total:'Total',shipping:'Shipping',order_ok:'Order Placed!',hi:'Hello',guest:'Guest',empty_cart:'Cart empty',place_order:'Place Order',province:'Province',district:'District',village:'Village',name:'Name',phone:'Phone'}
+};
+function t(k){return(T[lang]&&T[lang][k])||T.lo[k]||k;}
+
+const DEMO_CATS=[
+  {id:1,name_lo:'ອີເລັກໂທຣນິກ',name_th:'อิเล็กทรอนิกส์',name_en:'Electronics',icon:'📱',color:'#E3F2FD'},
+  {id:2,name_lo:'ເສື້ອຜ້າ',name_th:'เสื้อผ้า',name_en:'Clothing',icon:'👕',color:'#FCE4EC'},
+  {id:3,name_lo:'ຍານພາຫະນະ',name_th:'ยานพาหนะ',name_en:'Vehicles',icon:'🏍️',color:'#F3E5F5'},
+  {id:4,name_lo:'ອາຫານ',name_th:'อาหาร',name_en:'Food',icon:'🍜',color:'#FFF8E1'},
+  {id:5,name_lo:'ເຄື່ອງສໍາອາງ',name_th:'เครื่องสำอาง',name_en:'Beauty',icon:'💄',color:'#FFEBEE'},
+  {id:6,name_lo:'ກິລາ',name_th:'กีฬา',name_en:'Sports',icon:'⚽',color:'#E8F5E9'},
+  {id:7,name_lo:'ເຄື່ອງຄົວ',name_th:'เครื่องครัว',name_en:'Kitchen',icon:'🍳',color:'#FFF3E0'},
+  {id:8,name_lo:'ອະໄຫຼ',name_th:'อะไหล่',name_en:'Parts',icon:'⚙️',color:'#ECEFF1'},
+];
+const DEMO_PRODS=[
+  {id:1,name:'Samsung Galaxy A55 5G',price:6500000,original_price:7800000,emoji:'📱',category_id:1,rating:4.8,reviews_count:248,sold:1200,stock:50,description:'ໂທລະສັບ Samsung ໜ້າຈໍ 6.6" AMOLED ກ້ອງ 50MP ແບັດ 5000mAh',is_flash:true},
+  {id:2,name:'Nike Air Force 1',price:890000,original_price:1200000,emoji:'👟',category_id:2,rating:4.6,reviews_count:85,sold:430,stock:30,description:'ຮອງເທົ້າ Nike ລຸ້ນຄລາສສິກ',is_flash:false},
+  {id:3,name:'ໝວກກັນນ໊ອກ AGV K1',price:1250000,original_price:1500000,emoji:'🪖',category_id:3,rating:4.9,reviews_count:124,sold:310,stock:20,description:'ໝວກກັນນ໊ອກ AGV K1 ຄຸນນະພາບສູງ',is_flash:true},
+  {id:4,name:'ກາເຟ Lao Coffee 500g',price:85000,original_price:100000,emoji:'☕',category_id:4,rating:4.7,reviews_count:512,sold:3200,stock:200,description:'ກາເຟລາວ 100% ກິ່ນຫ໊ອມ',is_flash:false},
+  {id:5,name:'Lipstick MAC',price:320000,original_price:380000,emoji:'💋',category_id:5,rating:4.5,reviews_count:97,sold:670,stock:80,description:'ລິບສະຕິ໊ກ MAC ສີສວຍ ຕິດທົນ',is_flash:false},
+  {id:6,name:'Sony Alpha A7',price:25000000,original_price:28000000,emoji:'📷',category_id:1,rating:4.9,reviews_count:43,sold:89,stock:10,description:'ກ້ອງ Mirrorless Sony ລະດັບໂປ',is_flash:true},
+  {id:7,name:'ເສື້ອຍືດ Polo ລາຍລາວ',price:120000,original_price:150000,emoji:'👔',category_id:2,rating:4.3,reviews_count:203,sold:1800,stock:150,description:'ເສື້ອຍືດ Polo ລວດລາຍລາວ',is_flash:false},
+  {id:8,name:'Philips Rice Cooker',price:750000,original_price:890000,emoji:'🍚',category_id:7,rating:4.6,reviews_count:167,sold:456,stock:35,description:'ໝ້ໍ Philips ຫຸງຂ້າວ 1.5L',is_flash:false},
+];
+const PROVINCES=[
+  {n:'ນະຄອນຫຼວງ',c:['ຈັນທະບູລີ','ສີໂຄດຕະບອງ','ໄຊທານີ','ນາຊາຍທອງ','ຫາດຊາຍຟອງ','ສັງທອງ','ປາກງື່ມ','ສາຍເສດຖາ']},
+  {n:'ວຽງຈັນ',c:['ໂພນໂຮງ','ທຸລະຄົມ','ວາງວຽງ','ຫີນເຫີບ','ກາສີ','ຟ້ຽງ','ຊະນາຄາມ']},
+  {n:'ຫຼວງພະບາງ',c:['ເມືອງຫຼວງ','ຊຽງເງິນ','ງ່ອຍ','ປາກອູ','ນານ','ຈອມເພດ','ໂພນໄຊ']},
+  {n:'ສາວັນນະເຂດ',c:['ໄກສອນ','ອຸທຸມພອນ','ພິນ','ເຊໂປນ','ໜອງໄຊ','ຊົນນະບູລີ']},
+  {n:'ຈໍາປາສັກ',c:['ປາກເຊ','ສຸຂຸມາ','ຜີ່ບູນ','ໂຂງ','ສີດ','ອຸໂມງ']},
+  {n:'ຫຼວງນໍ້າທາ',c:['ທ່າໂຂງ','ສິງ','ລອງ','ວຽງພູຄາ']},
+  {n:'ບໍ່ແກ້ວ',c:['ຫ້ວຍຊາຍ','ທົ່ງໝີ່ຜາຍ','ເມືອງງານ']},
+  {n:'ອຸດົມໄຊ',c:['ໄຊ','ນ້ຳປຸ','ຫຼາ','ປາກແບງ']},
+  {n:'ຜົ້ງສາລີ',c:['ຜົ້ງສາລີ','ຂວາ','ໃໝ່','ສຳພັນ']},
+  {n:'ຫົວພັນ',c:['ຊໍາໃຕ້','ຊໍາເໜືອ','ວຽງໄຊ','ຮ່ວງ']},
+  {n:'ໄຊຍະບູລີ',c:['ໄຊຍະບູລີ','ຄອບ','ປາກລາຍ','ຮ່ວງ','ເງີນ']},
+  {n:'ຄໍາມ່ວນ',c:['ທ່າແຂກ','ມະຫາໄຊ','ໜ່ວງ','ສາ','ໜອງບົ່ນ']},
+  {n:'ເຊກອງ',c:['ລະມາມ','ທ່າແຕງ','ກາລຶມ']},
+  {n:'ອັດຕະປື',c:['ສາມັກຄີ','ສະໜາມໄຊ','ສານໄຊ']},
+  {n:'ໄຊສົມບູນ',c:['ອານຸວົງ','ຊໍາຈໍ','ຜາກ']},
+];
+const SHIPPING=[
+  {id:'lpexpress',name:'LP Express',icon:'🚚',desc:'1-3 ວັນ',price:15000,url:'https://lpexpress.la',color:'#E3F2FD'},
+  {id:'ecms',name:'ECMS Express',icon:'📦',desc:'2-4 ວັນ',price:20000,url:'https://ecmsglobal.com',color:'#FFF8E1'},
+  {id:'lao_post',name:'ໄປສະນີລາວ',icon:'📮',desc:'3-5 ວັນ',price:10000,url:'https://laospost.com',color:'#E8F5E9'},
+  {id:'kerry',name:'Kerry Express',icon:'🏢',desc:'2-3 ວັນ',price:25000,url:'https://kerryexpress.com',color:'#FCE4EC'},
+  {id:'jnt',name:'J&T Express',icon:'🚛',desc:'1-2 ວັນ',price:18000,url:'https://jtexpress.la',color:'#F3E5F5'},
+  {id:'ninjavan',name:'Ninja Van',icon:'🥷',desc:'2-4 ວັນ',price:22000,url:'https://ninjavan.co',color:'#FFF3E0'},
+  {id:'best',name:'Best Express',icon:'⚡',desc:'1-2 ວັນ',price:28000,url:'https://best-inc.com',color:'#FAFAFA'},
+  {id:'speedex',name:'Speedex Lao',icon:'🏎️',desc:'<24 ຊມ',price:35000,url:'#',color:'#FFEBEE'},
+];
+const BANKS=[
+  {id:'bcel',name:'BCEL',icon:'🏦'},{id:'ldb',name:'LDB',icon:'🏛️'},{id:'apb',name:'APB',icon:'🏢'},
+  {id:'jdb',name:'JDB',icon:'🏤'},{id:'maruhan',name:'Maruhan',icon:'🏦'},{id:'bfl',name:'BFL',icon:'💳'},
+  {id:'phongsavanh',name:'Phongsavanh',icon:'🏦'},{id:'indochina',name:'Indochina',icon:'🏛️'},{id:'military',name:'Military',icon:'🪖'},
+];
+const NOTIFS=[
+  {id:1,icon:'🛍️',bg:'#FCE4EC',text:'ຄໍາສັ່ງ #ORD001 ໄດ້ຮັບການຢືນຢັນ',time:'5 ນາທີ',unread:true},
+  {id:2,icon:'🚚',bg:'#E3F2FD',text:'ຄໍາສັ່ງ #ORD002 ກໍາລັງຈັດສົ່ງ',time:'1 ຊມ',unread:true},
+  {id:3,icon:'⚡',bg:'#FFF8E1',text:'Flash Sale 50% ກໍາລັງເລີ່ມ!',time:'2 ຊມ',unread:true},
+  {id:4,icon:'💰',bg:'#E8F5E9',text:'ເງິນໂອນ 500,000 ກີບ ສໍາເລັດ',time:'ມື້ວານ',unread:false},
+  {id:5,icon:'🎟️',bg:'#F3E5F5',text:'ຄູປ໋ອງ KAIDEE10 ຫຼຸດ 10%',time:'2 ວັນ',unread:false},
+];
+const VERSIONS=[
+  {v:'v1.0',name:'Classic Red',p:'#E8003D',bg:'#F5F5F5'},
+  {v:'v2.0',name:'Ocean Blue',p:'#0066CC',bg:'#F0F4F8'},
+  {v:'v3.0',name:'Forest Green',p:'#006400',bg:'#F0F5F0'},
+  {v:'v4.0',name:'Sunset Orange',p:'#FF6B00',bg:'#FFF8F0'},
+  {v:'v5.0',name:'Royal Purple',p:'#6B21A8',bg:'#F5F0FF'},
+  {v:'v6.0',name:'Rose Gold',p:'#BE185D',bg:'#FFF0F5'},
+  {v:'v7.0',name:'Dark Mode',p:'#E8003D',bg:'#0F0F0F'},
+  {v:'v8.0',name:'Teal Fresh',p:'#0D9488',bg:'#F0FDFA'},
+  {v:'v9.0',name:'Amber Gold',p:'#B45309',bg:'#FFFBEB'},
+  {v:'v10.0',name:'Crimson Dark',p:'#9B0000',bg:'#1A0000'},
+];
+
+// ── SOUND ──
+function playClick(){try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=800;g.gain.value=0.08;o.start();o.stop(c.currentTime+0.04);}catch(e){}}
+document.addEventListener('click',()=>playClick());
+
+// ── TOAST ──
+function toast(m,d=2500){const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),d);}
+
+// ── FORMAT ──
+function kip(n){return new Intl.NumberFormat('lo-LA').format(n)+' ₭';}
+function statusLabel(s){return{pending:'ລໍຖ້າ',confirmed:'ຢືນຢັນ',shipping:'ກໍາລັງສົ່ງ',delivered:'ສໍາເລັດ',cancelled:'ຍົກເລີກ'}[s]||s;}
+function statusCls(s){return{pending:'status-pending',shipping:'status-shipping',delivered:'status-delivered'}[s]||'status-pending';}
+
+// ── LANG ──
+function setLang(l){lang=l;localStorage.setItem('kd_lang',l);document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));document.getElementById('lang-'+l).classList.add('active');updateUI();}
+function updateUI(){
+  const m={'nav-home-label':t('home'),'nav-products-label':t('products'),'nav-cart-label':t('cart'),'nav-profile-label':t('profile'),'cat-title':t('catTitle'),'prod-title':t('prodTitle'),'cart-title':t('cart'),'prods-page-title':t('products')};
+  Object.entries(m).forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.textContent=v;});
+  document.getElementById('header-search').placeholder='🔍 '+t('search');
+  renderCategories();
+}
+
+// ── NAV ──
+function navTo(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.getElementById('nav-'+p).classList.add('active');
+  if(p==='profile')renderProfile();
+  if(p==='cart')renderCart();
+  if(p==='products')renderProductsPage();
+}
+
+// ── ADMIN TRIPLE-TAP ──
+document.getElementById('nav-profile').addEventListener('click',function(){
+  adminTaps++;clearTimeout(adminTimer);
+  adminTimer=setTimeout(()=>adminTaps=0,800);
+  if(adminTaps>=3){adminTaps=0;openAdminModal();}
+});
+
+// ── ADMIN LOGIN ──
+function openAdminModal(){document.getElementById('admin-modal').classList.add('open');setTimeout(()=>document.getElementById('admin-pw-input').focus(),300);}
+function closeAdminModal(){document.getElementById('admin-modal').classList.remove('open');document.getElementById('admin-pw-input').value='';}
+async function checkAdmin(){
+  const pw=document.getElementById('admin-pw-input').value;
+  const data=await sbQ('admin_settings','?select=admin_password&limit=1');
+  const correct=(data&&data[0]&&data[0].admin_password)?data[0].admin_password:null;
+  if(correct&&pw===correct){closeAdminModal();openAdminPanel();}
+  else{toast('❌ ລະຫັດຜິດ');document.getElementById('admin-pw-input').value='';}
+}
+function openAdminPanel(){document.getElementById('admin-panel').classList.add('open');adminTab('dashboard');}
+function closeAdminPanel(){document.getElementById('admin-panel').classList.remove('open');}
+function adminTab(tab){
+  document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));
+  const idx=['dashboard','products','orders','users','topup','withdraw','shipping','theme','coupons','cats'].indexOf(tab);
+  if(idx>=0)document.querySelectorAll('.admin-tab')[idx].classList.add('active');
+  renderAdmin(tab);
+}
+async function renderAdmin(tab){
+  const el=document.getElementById('admin-content');
+  el.innerHTML='<div class="loading-spinner"><div class="spinner"></div></div>';
+  if(tab==='dashboard'){
+    const [u,o,p]=await Promise.all([sbQ('profiles','?select=id'),sbQ('orders','?select=id,total'),sbQ('products','?select=id')]);
+    const rev=(o&&o.reduce)?o.reduce((a,x)=>a+(x.total||0),0):0;
+    el.innerHTML=`<div class="stat-grid">
+      <div class="stat-box"><div class="stat-box-val">${u.length||0}</div><div class="stat-box-lab">👥 ຜູ້ໃຊ້</div></div>
+      <div class="stat-box"><div class="stat-box-val">${o.length||0}</div><div class="stat-box-lab">📦 ຄໍາສັ່ງ</div></div>
+      <div class="stat-box"><div class="stat-box-val">${p.length||0}</div><div class="stat-box-lab">🛍️ ສິນຄ້າ</div></div>
+      <div class="stat-box"><div class="stat-box-val">${kip(rev)}</div><div class="stat-box-lab">💰 ລາຍຮັບ</div></div>
+    </div>
+    <div class="admin-card"><div class="admin-card-title">📈 ຍອດຂາຍ 6 ເດືອນ</div><div class="chart-bars" id="adm-chart"></div></div>
+    <div class="admin-card"><div class="admin-card-title">🔔 ຄໍາສັ່ງລ່າສຸດ</div><div id="adm-orders">ໂຫລດ...</div></div>`;
+    const mv=[35,52,41,68,79,95],mx=Math.max(...mv);
+    document.getElementById('adm-chart').innerHTML=['ມ.ກ','ກ.ພ','ມ.ນ','ເມ.ສ','ພ.ພ','ມ.ຖ'].map((m,i)=>`<div class="chart-bar-wrap"><div class="chart-bar" style="height:${(mv[i]/mx)*80}px"></div><span class="chart-month">${m}</span></div>`).join('');
+    const ro=await sbQ('orders','?select=id,total,status&order=created_at.desc&limit=5');
+    document.getElementById('adm-orders').innerHTML=ro.length?ro.map(x=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.08);font-size:13px;"><span style="color:rgba(255,255,255,0.7)">#${(x.id||'').toString().slice(0,8)}</span><span style="color:white;font-weight:700">${kip(x.total||0)}</span></div>`).join(''):'<p style="color:rgba(255,255,255,0.4)">ຍັງບໍ່ມີ</p>';
+  }
+  else if(tab==='products'){
+    const pr=await sbQ('products','?select=*&order=created_at.desc&limit=50');
+    el.innerHTML=`<button class="admin-btn admin-btn-primary" onclick="toast('📦 ໃຊ້ Supabase Dashboard ເພີ່ມສິນຄ້າ')" style="width:100%;margin-bottom:14px;">+ ເພີ່ມສິນຄ້າ</button>`
+    +(pr.length?pr:DEMO_PRODS).map(p=>`<div class="admin-card" style="margin-bottom:8px;"><div style="display:flex;align-items:center;gap:10px;"><div style="font-size:28px;">${p.emoji||'📦'}</div><div style="flex:1;"><div style="font-size:14px;font-weight:700;color:white;">${p.name}</div><div style="font-size:12px;color:rgba(255,255,255,0.5);">${kip(p.price)} | ສ.${p.stock||0} | ຂາຍ ${p.sold||0}</div></div><button onclick="sbDel('products',${p.id}).then(()=>{toast('🗑️ ລົບແລ້ວ');adminTab('products');})" style="padding:6px 10px;background:#c0392b;color:white;border-radius:6px;font-size:12px;">🗑️</button></div></div>`).join('');
+  }
+  else if(tab==='users'){
+    const us=await sbQ('profiles','?select=*&order=created_at.desc&limit=50');
+    el.innerHTML=`<div class="admin-card"><div class="admin-card-title">👥 ຜູ້ໃຊ້ທັງໝົດ (${us.length})</div>${us.length?us.map(u=>`<div class="user-row"><div class="user-avatar-sm">${(u.full_name||'?')[0].toUpperCase()}</div><div style="flex:1;"><div style="color:white;font-size:13px;font-weight:600;">${u.full_name||'?'}</div><div style="color:rgba(255,255,255,0.5);font-size:11px;">${u.email||''} | ${kip(u.wallet_balance||0)}</div></div><span class="status-badge ${u.is_seller?'badge-green':'badge-yellow'}">${u.is_seller?'ຜູ້ຂາຍ':'ຜູ້ຊື້'}</span></div>`).join(''):'<p style="color:rgba(255,255,255,0.4)">ຍັງບໍ່ມີ</p>'}</div>`;
+  }
+  else if(tab==='orders'){
+    const ord=await sbQ('orders','?select=*&order=created_at.desc&limit=50');
+    el.innerHTML=`<div class="admin-card"><div class="admin-card-title">📋 ຄໍາສັ່ງ (${ord.length})</div>${ord.length?ord.map(o=>`<div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:12px;margin-bottom:8px;"><div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:white;font-weight:700;font-size:13px;">#${(o.id||'').toString().slice(0,8)}</span><span style="color:#FFD700;font-weight:700;">${kip(o.total||0)}</span></div><div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:8px;">${o.customer_name||''} | ${o.shipping_method||''}</div><select onchange="sbUpd('orders','${o.id}',{status:this.value}).then(()=>toast('✅ อัปเดต'))" style="width:100%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:white;padding:6px;font-size:12px;"><option value="pending" ${o.status==='pending'?'selected':''}>ລໍຖ້າ</option><option value="confirmed" ${o.status==='confirmed'?'selected':''}>ຢືນຢັນ</option><option value="shipping" ${o.status==='shipping'?'selected':''}>ຈັດສົ່ງ</option><option value="delivered" ${o.status==='delivered'?'selected':''}>ສໍາເລັດ</option><option value="cancelled" ${o.status==='cancelled'?'selected':''}>ຍົກເລີກ</option></select></div>`).join(''):'<p style="color:rgba(255,255,255,0.4)">ຍັງບໍ່ມີ</p>'}</div>`;
+  }
+  else if(tab==='topup'){
+    const req=await sbQ('topup_requests','?select=*&order=created_at.desc&limit=50');
+    const cfg=await sbQ('admin_settings','?select=qr_code_url&limit=1');
+    const qrUrl=(cfg&&cfg[0])?cfg[0].qr_code_url:'';
+    el.innerHTML=`<div class="admin-card"><div class="admin-card-title">📷 QR Code ທະນາຄານ</div>
+    ${qrUrl?`<div style="text-align:center;margin-bottom:12px;"><img src="${qrUrl}" style="max-width:180px;border-radius:12px;border:3px solid var(--primary);"></div>`:'<p style="color:rgba(255,255,255,0.4);margin-bottom:12px;text-align:center;">ຍັງບໍ່ໄດ້ອັບໂຫລດ QR</p>'}
+    <input type="file" id="qr-file" accept="image/*" style="display:none" onchange="uploadQR(this)">
+    <button class="admin-btn admin-btn-primary" onclick="document.getElementById('qr-file').click()" style="width:100%;margin-bottom:16px;">📷 ອັບໂຫລດ QR ໃໝ່</button>
+    </div>
+    <div class="admin-card"><div class="admin-card-title">💰 ຄໍາຮ້ອງເຕີມເງິນ (${req.length})</div>
+    ${req.length?req.map(r=>`<div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:12px;margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:white;font-weight:700;">${r.user_name||'?'}</span><span style="color:#FFD700;font-weight:700;">${kip(r.amount||0)}</span></div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:8px;">${r.bank||''} | ${r.created_at?new Date(r.created_at).toLocaleDateString():''}</div>
+      ${r.slip_url?`<img src="${r.slip_url}" style="width:100%;border-radius:8px;max-height:160px;object-fit:contain;margin-bottom:10px;">`:''}
+      ${r.status==='pending'?`<div style="display:flex;gap:8px;"><button class="admin-btn admin-btn-success" onclick="approveTopup('${r.id}','${r.user_id}',${r.amount})" style="flex:1;">✅ ອະນຸມັດ</button><button class="admin-btn" onclick="sbUpd('topup_requests','${r.id}',{status:'rejected'}).then(()=>{toast('❌ ປະຕິເສດ');adminTab('topup');})" style="flex:1;background:#c0392b;color:white;">❌ ປະຕິເສດ</button></div>`:`<span class="status-badge ${r.status==='approved'?'badge-green':'badge-red'}">${r.status}</span>`}
+    </div>`).join(''):'<p style="color:rgba(255,255,255,0.4)">ຍັງບໍ່ມີ</p>'}</div>`;
+  }
+  else if(tab==='withdraw'){
+    const wr=await sbQ('withdraw_requests','?select=*&order=created_at.desc&limit=50');
+    el.innerHTML=`<div class="admin-card"><div class="admin-card-title">💸 ຄໍາຮ້ອງຖອນເງິນ (${wr.length})</div>${wr.length?wr.map(r=>`<div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:12px;margin-bottom:8px;"><div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:white;font-weight:700;">${r.seller_name||'?'}</span><span style="color:#FFD700;font-weight:700;">${kip(r.amount||0)}</span></div><div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:8px;">${r.bank_info||''}</div>${r.status==='pending'?`<div style="display:flex;gap:8px;"><button class="admin-btn admin-btn-success" onclick="approveWithdraw('${r.id}','${r.seller_id}',${r.amount})" style="flex:1;">✅ ອະນຸມັດ</button><button onclick="sbUpd('withdraw_requests','${r.id}',{status:'rejected'}).then(()=>{toast('❌');adminTab('withdraw');})" style="flex:1;background:#c0392b;color:white;border-radius:8px;padding:10px;font-weight:700;">❌</button></div>`:`<span class="status-badge ${r.status==='approved'?'badge-green':'badge-red'}">${r.status}</span>`}</div>`).join(''):'<p style="color:rgba(255,255,255,0.4)">ຍັງບໍ່ມີ</p>'}</div>`;
+  }
+  else if(tab==='shipping'){
+    el.innerHTML=`<div class="admin-card"><div class="admin-card-title">🚚 ຂົນສົ່ງໃນ ສປປ ລາວ</div>${SHIPPING.map(s=>`<div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,0.05);border-radius:10px;margin-bottom:8px;"><div style="font-size:28px;">${s.icon}</div><div style="flex:1;"><div style="font-size:14px;font-weight:700;color:white;">${s.name}</div><div style="font-size:12px;color:rgba(255,255,255,0.5);">${s.desc}</div></div><div style="text-align:right;"><div style="font-size:13px;color:#FFD700;font-weight:700;">${kip(s.price)}</div><a href="${s.url}" target="_blank" style="font-size:11px;color:#2196F3;">🔗</a></div></div>`).join('')}</div>`;
+  }
+  else if(tab==='theme'){
+    el.innerHTML=`<div class="admin-card"><div class="admin-card-title">🎨 ສີຫຼັກ</div><div style="display:flex;flex-wrap:wrap;gap:10px;">${['#E8003D','#0066CC','#006400','#FF6B00','#6B21A8','#BE185D','#0D9488','#B45309','#9B0000','#1E40AF'].map(c=>`<div onclick="applyColor('${c}')" style="width:40px;height:40px;background:${c};border-radius:50%;cursor:pointer;border:3px solid ${theme.primary===c?'white':'transparent'};transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'"></div>`).join('')}</div></div>
+    <div class="admin-card"><div class="admin-card-title">📱 ໂລໂກ້</div><input class="admin-input" id="logo-input" value="${theme.logo}"><button class="admin-btn admin-btn-primary" onclick="saveLogo()" style="width:100%;">💾 ບັນທຶກ</button></div>
+    <div class="admin-card"><div class="admin-card-title">🎭 ເວີຊັ່ນ UI (10 ເວີຊັ່ນ)</div>${VERSIONS.map((v,i)=>`<div onclick="applyVersion(${i})" style="display:flex;align-items:center;gap:10px;padding:12px;background:${theme.version===v.v?'rgba(255,255,255,0.1)':'rgba(255,255,255,0.04)'};border:2px solid ${theme.version===v.v?'var(--primary)':'transparent'};border-radius:10px;margin-bottom:8px;cursor:pointer;"><div style="width:48px;height:28px;background:${v.p};border-radius:6px;"></div><div style="flex:1;"><div style="color:white;font-size:13px;font-weight:700;">${v.v} - ${v.name}</div></div>${theme.version===v.v?'<span style="color:var(--primary);font-size:20px;">✓</span>':''}</div>`).join('')}</div>
+    <div class="admin-card"><div class="admin-card-title">🖼️ ໄອຄອນ</div><div style="display:flex;flex-wrap:wrap;gap:10px;">${['🛒','🏪','🛍️','💫','⭐','🔥','💎','🎯','🚀','💼','🏆','🌈'].map(ic=>`<button onclick="document.getElementById('app-logo-text').textContent='${ic} '+theme.logo;toast('ປ່ຽນໄອຄອນ ${ic}')" style="width:44px;height:44px;font-size:24px;border-radius:10px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);cursor:pointer;">${ic}</button>`).join('')}</div></div>`;
+  }
+  else if(tab==='coupons'){
+    const cp=await sbQ('coupons','?select=*&order=created_at.desc');
+    el.innerHTML=`<div class="admin-card"><div class="admin-card-title">➕ ສ້າງຄູປ໋ອງ</div>
+    <input class="admin-input" id="cp-code" placeholder="ລະຫັດ (KAIDEE10)">
+    <input class="admin-input" type="number" id="cp-disc" placeholder="ສ່ວນຫຼຸດ %">
+    <input class="admin-input" type="number" id="cp-min" placeholder="ຄໍາສັ່ງຂັ້ນຕໍ່າ">
+    <button class="admin-btn admin-btn-success" onclick="createCoupon()" style="width:100%;">💾 ສ້າງ</button></div>
+    <div class="admin-card"><div class="admin-card-title">🎟️ ຄູປ໋ອງທັງໝົດ</div>${cp.length?cp.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.08);"><div><div style="color:#FFD700;font-weight:700;">${c.code}</div><div style="color:rgba(255,255,255,0.5);font-size:12px;">ຫຼຸດ ${c.discount}%</div></div><button onclick="sbDel('coupons','${c.id}').then(()=>{toast('🗑️');adminTab('coupons');})" style="color:#ff5252;font-size:18px;">🗑️</button></div>`).join(''):'<p style="color:rgba(255,255,255,0.4)">ຍັງບໍ່ມີ</p>'}</div>`;
+  }
+  else if(tab==='cats'){
+    const ct=await sbQ('categories','?select=*&order=sort_order.asc');
+    el.innerHTML=`<div class="admin-card"><div class="admin-card-title">➕ ເພີ່ມໝວດໝູ່</div>
+    <input class="admin-input" id="ct-name" placeholder="ຊື່ (ພາສາລາວ)">
+    <input class="admin-input" id="ct-icon" placeholder="Emoji (📱)">
+    <input class="admin-input" id="ct-color" placeholder="ສີ (#E3F2FD)">
+    <button class="admin-btn admin-btn-success" onclick="addCat()" style="width:100%;">+ ເພີ່ມ</button></div>
+    <div class="admin-card"><div class="admin-card-title">🗂️ ໝວດໝູ່ທັງໝົດ</div>${(ct.length?ct:DEMO_CATS).map(c=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.08);"><div style="font-size:28px;">${c.icon||'📦'}</div><div style="flex:1;color:white;font-size:14px;">${c.name_lo||c.name}</div><button onclick="sbDel('categories',${c.id}).then(()=>{toast('🗑️');adminTab('cats');loadCats();})" style="color:#ff5252;font-size:18px;">🗑️</button></div>`).join('')}</div>`;
+  }
+}
+function applyColor(c){theme.primary=c;document.documentElement.style.setProperty('--primary',c);toast('🎨 ສີປ່ຽນແລ້ວ');sbIns('app_settings',{key:'primary_color',value:c}).catch(()=>{});}
+function saveLogo(){const v=document.getElementById('logo-input').value.trim();if(!v)return;theme.logo=v;document.getElementById('app-logo-text').textContent=v;document.getElementById('splash-logo').textContent=v;document.title=v+' - ຊື້ຂາຍລາວ';toast('💾 ບັນທຶກແລ້ວ');sbIns('app_settings',{key:'logo_text',value:v}).catch(()=>{});}
+function applyVersion(i){const v=VERSIONS[i];theme.version=v.v;theme.primary=v.p;document.documentElement.style.setProperty('--primary',v.p);document.documentElement.style.setProperty('--bg',v.bg);document.getElementById('version-tag').textContent=v.v;toast('✅ '+v.v+' - '+v.name);adminTab('theme');sbIns('app_settings',{key:'app_version',value:v.v}).catch(()=>{});}
+async function uploadQR(input){
+  if(!input.files[0])return;
+  const url=await sbUpload('admin-assets','qr/'+Date.now(),input.files[0]);
+  if(url){await sbUpd('admin_settings',1,{qr_code_url:url});toast('✅ QR อัปโหลดแล้ว');adminTab('topup');}
+  else toast('❌ อัปโหลดไม่ได้');
+}
+async function approveTopup(rid,uid,amt){
+  await sbUpd('topup_requests',rid,{status:'approved'});
+  const p=await sbQ('profiles','?id=eq.'+uid+'&select=wallet_balance');
+  const cur=(p[0]&&p[0].wallet_balance)||0;
+  await sbUpd('profiles',uid,{wallet_balance:cur+amt});
+  await sbIns('transactions',{user_id:uid,type:'in',amount:amt,description:'ເຕີມເງິນ',created_at:new Date().toISOString()});
+  toast('✅ ອະນຸມັດ '+kip(amt));adminTab('topup');
+}
+async function approveWithdraw(rid,sid,amt){
+  await sbUpd('withdraw_requests',rid,{status:'approved'});
+  const p=await sbQ('profiles','?id=eq.'+sid+'&select=wallet_balance');
+  const cur=(p[0]&&p[0].wallet_balance)||0;
+  await sbUpd('profiles',sid,{wallet_balance:Math.max(0,cur-amt)});
+  toast('✅ ອະນຸມັດ ຖອນ '+kip(amt));adminTab('withdraw');
+}
+async function createCoupon(){
+  const code=document.getElementById('cp-code').value.trim().toUpperCase();
+  const disc=parseInt(document.getElementById('cp-disc').value)||0;
+  const min=parseInt(document.getElementById('cp-min').value)||0;
+  if(!code||!disc){toast('❗ ໃສ່ຂໍ້ມູນ');return;}
+  await sbIns('coupons',{code,discount:disc,min_order:min,is_active:true,used_count:0,created_at:new Date().toISOString()});
+  toast('✅ ສ້າງ '+code);adminTab('coupons');
+}
+async function addCat(){
+  const name=document.getElementById('ct-name').value.trim();
+  const icon=document.getElementById('ct-icon').value.trim()||'📦';
+  const color=document.getElementById('ct-color').value.trim()||'#F5F5F5';
+  if(!name){toast('❗ ໃສ່ຊື່');return;}
+  await sbIns('categories',{name_lo:name,name_th:name,name_en:name,icon,color,is_active:true});
+  toast('✅ ເພີ່ມ '+name);adminTab('cats');loadCats();
+}
+
+// ── LOAD DATA ──
+async function loadCats(){
+  const d=await sbQ('categories','?is_active=eq.true&order=sort_order.asc');
+  cats=d.length?d:DEMO_CATS;renderCategories();
+}
+async function loadProds(){
+  const d=await sbQ('products','?is_active=eq.true&order=created_at.desc&limit=100');
+  products=d.length?d:DEMO_PRODS;
+  renderProducts();renderProductsPage();
+}
+async function loadSettings(){
+  const d=await sbQ('app_settings','?select=key,value');
+  if(d&&d.length)d.forEach(s=>{
+    if(s.key==='primary_color'){theme.primary=s.value;document.documentElement.style.setProperty('--primary',s.value);}
+    if(s.key==='logo_text'){theme.logo=s.value;document.getElementById('app-logo-text').textContent=s.value;}
+    if(s.key==='app_version'){theme.version=s.value;document.getElementById('version-tag').textContent=s.value;}
+  });
+}
+
+// ── CATEGORIES ──
+function renderCategories(){
+  const lk=lang==='en'?'name_en':lang==='th'?'name_th':'name_lo';
+  const html=cats.map(c=>`<div class="cat-item" onclick="filterCat(${c.id})"><div class="cat-icon" style="background:${c.color||'#f0f0f0'}">${c.icon||'📦'}</div><span class="cat-name">${c[lk]||c.name_lo}</span></div>`).join('');
+  document.getElementById('cats-container').innerHTML=html;
+  document.getElementById('cats-filter').innerHTML=`<div class="cat-item" onclick="renderProductsPage(null)"><div class="cat-icon" style="background:#f0f0f0">🏠</div><span class="cat-name">ທັງໝົດ</span></div>`+html;
+}
+function filterCat(id){navTo('products');renderProductsPage(id);}
+
+// ── PRODUCTS ──
+function prodCard(p){
+  const disc=p.original_price?Math.round((1-p.price/p.original_price)*100):(p.discount||0);
+  return`<div class="product-card" onclick="openProd(${p.id})">
+    <div class="product-img">${p.image_url?`<img src="${p.image_url}" loading="lazy">`:`<span style="font-size:48px;">${p.emoji||'📦'}</span>`}
+    ${disc?`<div class="product-badge">-${disc}%</div>`:''}
+    <button class="product-fav" onclick="event.stopPropagation();toast('❤️ ໂປດ')">❤️</button></div>
+    <div class="product-info"><div class="product-name">${p.name}</div>
+    <div><span class="product-price">${kip(p.price)}</span>${p.original_price?`<span class="product-old-price">${kip(p.original_price)}</span>`:''}</div>
+    <div class="product-meta"><span class="stars">${'★'.repeat(Math.round(p.rating||4))}${'☆'.repeat(5-Math.round(p.rating||4))}</span><span class="rating-count">(${p.reviews_count||0})</span><span class="sold-count">ຂາຍ ${p.sold||0}</span></div></div>
+    <button class="add-cart-btn" onclick="event.stopPropagation();addCart(${p.id})">${t('addCart')}</button></div>`;
+}
+function renderProducts(cid){
+  const f=cid?products.filter(p=>p.category_id===cid):products;
+  document.getElementById('flash-products').innerHTML=f.filter(p=>p.is_flash).slice(0,6).map(prodCard).join('');
+  document.getElementById('all-products').innerHTML=f.filter(p=>!p.is_flash).slice(0,20).map(prodCard).join('');
+}
+function renderProductsPage(cid){
+  const f=cid!=null?products.filter(p=>p.category_id===cid):products;
+  document.getElementById('page-products-grid').innerHTML=f.slice(0,40).map(prodCard).join('');
+}
+
+// ── PRODUCT DETAIL ──
+function openProd(id){
+  const p=products.find(x=>x.id===id)||DEMO_PRODS.find(x=>x.id===id);if(!p)return;
+  const disc=p.original_price?Math.round((1-p.price/p.original_price)*100):(p.discount||0);
+  detailQty=1;
+  document.getElementById('detail-content').innerHTML=`
+  <div style="background:white;"><div class="detail-main-img">${p.image_url?`<img src="${p.image_url}">`:`<span>${p.emoji||'📦'}</span>`}</div></div>
+  <div class="detail-body">
+    <div class="detail-price-row"><span class="detail-price">${kip(p.price)}</span>${p.original_price?`<span class="detail-oldprice">${kip(p.original_price)}</span>`:''} ${disc?`<span class="detail-discount">-${disc}%</span>`:''}</div>
+    <div class="detail-name">${p.name}</div>
+    <div class="detail-rating"><span class="stars" style="font-size:16px;">${'★'.repeat(Math.round(p.rating||4))}${'☆'.repeat(5-Math.round(p.rating||4))}</span><b>${p.rating||4.5}</b><span style="color:var(--text3);font-size:13px;">(${p.reviews_count||0}) | ຂາຍ ${p.sold||0}</span></div>
+    <div class="detail-section"><div class="detail-section-title">ຂະໜາດ</div><div class="variant-options">${['S','M','L','XL','XXL'].map((s,i)=>`<button class="variant-btn ${i===1?'active':''}" onclick="document.querySelectorAll('.variant-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">${s}</button>`).join('')}</div></div>
+    <div class="detail-section"><div class="detail-section-title">ຈໍານວນ</div>
+    <div class="qty-row"><button class="qty-btn" onclick="chgQty(-1)">−</button><span class="qty-val" id="prod-qty">1</span><button class="qty-btn" onclick="chgQty(1)">+</button><span style="font-size:13px;color:var(--text3);margin-left:auto;">ສ.ຄ. ${p.stock||50}</span></div>
+    <div class="stock-bar"><div class="stock-fill" style="width:${Math.min(100,(p.sold||0)/((p.stock||50)+(p.sold||0))*100)}%"></div></div></div>
+    <div class="detail-section"><div class="detail-section-title">🚚 ຂົນສົ່ງ</div>${SHIPPING.slice(0,4).map(s=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);"><span style="font-size:20px;">${s.icon}</span><div style="flex:1;font-size:13px;">${s.name} - ${s.desc}</div><a href="${s.url}" target="_blank" style="font-size:12px;color:var(--info);font-weight:600;">${kip(s.price)}</a></div>`).join('')}</div>
+    <div class="detail-section"><div class="detail-section-title">📝 ລາຍລະອຽດ</div><p style="font-size:14px;color:var(--text2);line-height:1.7;">${p.description||'ສິນຄ້າຄຸນນະພາບ ໄດ້ຮັບການຢືນຢັນ'}</p></div>
+    <div class="detail-section"><div class="detail-section-title">⭐ ລີວິວ (${p.reviews_count||0})</div>
+    ${[{n:'ສົມສັກ ວ.',r:5,t:'ສິນຄ້າດີ ຈັດສົ່ງໄວ',a:'ສ'},{n:'ນາລີ ພ.',r:4,t:'ຄຸນນະພາບດີ ລາຄາເໝາະ',a:'ນ'},{n:'ພູທອນ ຂ.',r:5,t:'ຕາມໂຄສະນາ',a:'ພ'}].map(rv=>`<div class="review-item"><div class="review-user"><div class="review-avatar">${rv.a}</div><div><div style="font-size:13px;font-weight:600;">${rv.n}</div><span class="stars" style="font-size:12px;">${'★'.repeat(rv.r)}${'☆'.repeat(5-rv.r)}</span></div></div><div style="font-size:13px;color:var(--text2);line-height:1.6;">${rv.t}</div></div>`).join('')}
+    </div>
+  </div>`;
+  document.getElementById('detail-actions').innerHTML=`<button class="btn-cart" onclick="addCart(${p.id});closeDetail()">${t('addCart')}</button><button class="btn-buy" onclick="addCart(${p.id});closeDetail();navTo('cart');">${t('buyNow')}</button>`;
+  document.getElementById('product-detail').classList.add('open');
+}
+function closeDetail(){document.getElementById('product-detail').classList.remove('open');}
+function chgQty(d){detailQty=Math.max(1,detailQty+d);document.getElementById('prod-qty').textContent=detailQty;}
+function shareProduct(){if(navigator.share)navigator.share({title:'ຂາຍດີ',url:location.href});else toast('📤 URL ຄັດລອກ');}
+
+// ── CART ──
+function addCart(id){
+  const p=products.find(x=>x.id===id)||DEMO_PRODS.find(x=>x.id===id);if(!p)return;
+  const e=cart.find(c=>c.id===id);
+  if(e)e.qty=(e.qty||1)+1;else cart.push({id:p.id,name:p.name,price:p.price,emoji:p.emoji||'📦',qty:1,image_url:p.image_url||null});
+  saveCart();toast('🛒 '+t('added'));
+}
+function saveCart(){
+  localStorage.setItem('kd_cart',JSON.stringify(cart));
+  const n=cart.reduce((a,c)=>a+(c.qty||1),0);
+  const b=document.getElementById('cart-count');b.textContent=n;b.style.display=n>0?'block':'none';
+}
+function renderCart(){
+  const el=document.getElementById('cart-items');
+  if(!cart.length){
+    el.innerHTML=`<div class="empty-state"><div class="empty-icon">🛒</div><div class="empty-title">${t('empty_cart')}</div><div class="empty-sub">ເລີ່ມຊ້ອບດຽວນີ້</div></div>`;
+    document.getElementById('cart-summary').innerHTML='';return;
+  }
+  el.innerHTML=cart.map(c=>`<div class="cart-item">
+    <div class="cart-img">${c.image_url?`<img src="${c.image_url}" style="width:100%;height:100%;object-fit:cover;">`:`<span>${c.emoji}</span>`}</div>
+    <div class="cart-info"><div class="cart-name">${c.name}</div><div class="cart-price">${kip(c.price)}</div>
+    <div class="cart-qty-row"><button class="cart-qty-btn" onclick="cartQty(${c.id},-1)">−</button><span class="cart-qty-val">${c.qty||1}</span><button class="cart-qty-btn" onclick="cartQty(${c.id},1)">+</button><button class="cart-delete" onclick="cartRm(${c.id})">🗑️</button></div></div></div>`).join('');
+  const sub=cart.reduce((a,c)=>a+c.price*(c.qty||1),0);
+  document.getElementById('cart-summary').innerHTML=`<div class="summary-row"><span>ສິນຄ້າ</span><span>${kip(sub)}</span></div><div class="summary-row"><span>${t('shipping')}</span><span>${kip(15000)}</span></div><div class="summary-row total"><span>${t('total')}</span><span class="val">${kip(sub+15000)}</span></div>`;
+}
+function cartQty(id,d){const c=cart.find(x=>x.id===id);if(!c)return;c.qty=Math.max(1,(c.qty||1)+d);saveCart();renderCart();}
+function cartRm(id){cart=cart.filter(c=>c.id!==id);saveCart();renderCart();}
+async function applyCoupon(){
+  const code=document.getElementById('coupon-input').value.trim().toUpperCase();if(!code)return;
+  const d=await sbQ('coupons',`?code=eq.${code}&is_active=eq.true`);
+  if(d&&d.length)toast(`🎟️ ຫຼຸດ ${d[0].discount}% ໃຊ້ສໍາເລັດ!`);
+  else if(code==='KAIDEE10')toast('🎟️ KAIDEE10 ຫຼຸດ 10%!');
+  else toast('❌ ລະຫັດຜິດ');
+}
+
+// ── CHECKOUT ──
+function openCheckout(){
+  if(!cart.length){toast('🛒 ກະຕ່າຫວ່າງ');return;}
+  if(!user){toast('⚠️ ກະລຸນາ Login');openAuth();return;}
+  selShipping=SHIPPING[0];
+  renderCheckout();document.getElementById('checkout-page').classList.add('open');
+}
+function closeCheckout(){document.getElementById('checkout-page').classList.remove('open');}
+function renderCheckout(){
+  const sub=cart.reduce((a,c)=>a+c.price*(c.qty||1),0);
+  document.getElementById('checkout-content').innerHTML=`<div style="padding:16px;">
+    <div style="background:white;border-radius:var(--radius);padding:16px;margin-bottom:14px;box-shadow:var(--shadow);">
+      <div style="font-size:15px;font-weight:700;margin-bottom:14px;">📍 ທີ່ຢູ່</div>
+      <div class="form-group"><label class="form-label">${t('name')}</label><input class="form-input" id="co-name" value="${user.full_name||''}"></div>
+      <div class="form-group"><label class="form-label">${t('phone')}</label><input class="form-input" id="co-phone" value="${user.phone||''}" type="tel"></div>
+      <div class="form-group"><label class="form-label">${t('province')}</label>
+        <input class="form-input" id="co-prov-search" placeholder="ຄົ້ນຫາ..." oninput="provSearch(this.value)" style="margin-bottom:6px;">
+        <select class="province-select" id="co-prov" onchange="loadDist(this.value)"><option value="">ເລືອກ</option>${PROVINCES.map(p=>`<option>${p.n}</option>`).join('')}</select></div>
+      <div class="form-group"><label class="form-label">${t('district')}</label><select class="province-select" id="co-dist"><option>ເລືອກ</option></select></div>
+      <div class="form-group"><label class="form-label">${t('village')}</label><input class="form-input" id="co-village" placeholder="ຊື່ບ້ານ / ລາຍລະອຽດ"></div>
+    </div>
+    <div style="margin-bottom:14px;"><div style="font-size:15px;font-weight:700;margin-bottom:10px;">🚚 ຂົນສົ່ງ</div>
+    ${SHIPPING.map(s=>`<div class="shipping-option ${s.id==='lpexpress'?'selected':''}" id="ship-${s.id}" onclick="pickShip('${s.id}')">
+      <div class="shipping-logo" style="background:${s.color}">${s.icon}</div>
+      <div style="flex:1;"><div class="shipping-name">${s.name}</div><div class="shipping-desc">${s.desc}</div>
+      <a href="${s.url}" target="_blank" style="font-size:12px;color:var(--info);">🔗 ກວດສອບ</a></div>
+      <div class="shipping-price">${kip(s.price)}</div></div>`).join('')}</div>
+    <div class="cart-summary" style="margin:0 0 14px;"><div class="summary-row"><span>ສິນຄ້າ</span><span>${kip(sub)}</span></div><div class="summary-row"><span>ຂົນສົ່ງ</span><span id="co-sfee">${kip(selShipping.price)}</span></div><div class="summary-row total"><span>${t('total')}</span><span class="val" id="co-total">${kip(sub+selShipping.price)}</span></div></div>
+    <button class="form-btn" onclick="placeOrder()" style="font-size:16px;padding:16px;">${t('place_order')}</button>
+  </div>`;
+}
+function provSearch(q){const s=document.getElementById('co-prov');if(!q)return;const f=PROVINCES.filter(p=>p.n.includes(q));if(f.length){s.value=f[0].n;loadDist(f[0].n);}}
+function loadDist(pn){const p=PROVINCES.find(x=>x.n===pn);const s=document.getElementById('co-dist');s.innerHTML='<option>ເລືອກ</option>'+(p?p.c.map(c=>`<option>${c}</option>`).join(''):'');}
+function pickShip(id){
+  selShipping=SHIPPING.find(s=>s.id===id)||SHIPPING[0];
+  document.querySelectorAll('.shipping-option').forEach(e=>e.classList.remove('selected'));
+  const el=document.getElementById('ship-'+id);if(el)el.classList.add('selected');
+  const sub=cart.reduce((a,c)=>a+c.price*(c.qty||1),0);
+  document.getElementById('co-sfee').textContent=kip(selShipping.price);
+  document.getElementById('co-total').textContent=kip(sub+selShipping.price);
+}
+async function placeOrder(){
+  const name=document.getElementById('co-name').value.trim();
+  const phone=document.getElementById('co-phone').value.trim();
+  const prov=document.getElementById('co-prov').value;
+  const dist=document.getElementById('co-dist').value;
+  const village=document.getElementById('co-village').value.trim();
+  if(!name||!phone||!prov||prov==='ເລືອກ'){toast('❗ ໃສ່ຂໍ້ມູນ');return;}
+  const sub=cart.reduce((a,c)=>a+c.price*(c.qty||1),0);
+  const res=await sbIns('orders',{user_id:user.id,customer_name:name,customer_phone:phone,address:`${village}, ${dist}, ${prov}`,items:JSON.stringify(cart),subtotal:sub,shipping_fee:selShipping.price,total:sub+selShipping.price,shipping_method:selShipping.name,status:'pending',created_at:new Date().toISOString()});
+  cart=[];saveCart();renderCart();closeCheckout();
+  toast('🎉 '+t('order_ok'));openOrderPage();
+}
+
+// ── ORDERS ──
+async function openOrderPage(){
+  document.getElementById('order-page').classList.add('open');
+  if(!user){document.getElementById('order-content').innerHTML=`<div class="empty-state"><div class="empty-icon">📦</div><div class="empty-title">ຍັງບໍ່ໄດ້ Login</div></div>`;return;}
+  const orders=await sbQ('orders',`?user_id=eq.${user.id}&order=created_at.desc&limit=20`);
+  const el=document.getElementById('order-content');
+  if(!orders.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">📦</div><div class="empty-title">ຍັງບໍ່ມີຄໍາສັ່ງ</div></div>`;return;}
+  el.innerHTML=orders.map(o=>`<div class="order-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <span style="font-size:12px;color:var(--text3);">#${(o.id||'').toString().slice(0,8)}</span>
+      <span class="order-status ${statusCls(o.status)}">${statusLabel(o.status)}</span>
+    </div>
+    <div style="font-size:14px;color:var(--text2);margin-bottom:6px;">${o.customer_name} | ${o.customer_phone}</div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:6px;">📍 ${o.address}</div>
+    <div style="font-size:13px;color:var(--text3);">🚚 ${o.shipping_method||''}</div>
+    <div class="delivery-track" style="margin-top:12px;">
+      <div class="track-step"><div class="track-dot done">✓</div><div class="track-info"><div class="track-title">ຮັບຄໍາສັ່ງ</div><div class="track-time">${new Date(o.created_at||Date.now()).toLocaleDateString('lo-LA')}</div></div></div>
+      <div class="track-step"><div class="track-dot ${['confirmed','shipping','delivered'].includes(o.status)?'done':'pending'}">${['confirmed','shipping','delivered'].includes(o.status)?'✓':'·'}</div><div class="track-info"><div class="track-title">ຢືນຢັນ</div></div></div>
+      <div class="track-step"><div class="track-dot ${['shipping','delivered'].includes(o.status)?'active':'pending'}">${['shipping','delivered'].includes(o.status)?'🚚':'·'}</div><div class="track-info"><div class="track-title">ຈັດສົ່ງ</div></div></div>
+      <div class="track-step"><div class="track-dot ${o.status==='delivered'?'done':'pending'}">${o.status==='delivered'?'✓':'·'}</div><div class="track-info"><div class="track-title">ສໍາເລັດ</div></div></div>
+    </div>
+    <div style="text-align:right;font-size:18px;font-weight:800;color:var(--primary);margin-top:12px;">${kip(o.total||0)}</div>
+  </div>`).join('');
+}
+function closeOrderPage(){document.getElementById('order-page').classList.remove('open');}
+
+// ── PROFILE ──
+function renderProfile(){
+  const el=document.getElementById('profile-content');
+  if(!user){
+    el.innerHTML=`<div style="text-align:center;padding:50px 20px;">
+      <div style="font-size:72px;margin-bottom:16px;">👤</div>
+      <div style="font-size:20px;font-weight:800;margin-bottom:8px;">${t('hi')} ${t('guest')}!</div>
+      <div style="font-size:14px;color:var(--text3);margin-bottom:24px;">Login ເພື່ອຊ້ອບສິນຄ້າ</div>
+      <button class="form-btn" onclick="openAuth()" style="width:auto;padding:12px 36px;border-radius:24px;">${t('login')} / ${t('reg')}</button>
+    </div>
+    <div class="menu-list"><div class="menu-item" onclick="navTo('home')"><div class="menu-icon" style="background:#FFF3E0;">🏠</div><div class="menu-text"><div class="menu-title">${t('home')}</div></div><span class="menu-arrow">›</span></div></div>`;
+    return;
+  }
+  const u=user;
+  el.innerHTML=`<div class="profile-top">
+    <div class="profile-cover">${u.cover_url?`<img src="${u.cover_url}" style="width:100%;height:100%;object-fit:cover;">`:''}
+      <label for="cover-up" class="cover-edit" style="cursor:pointer;">📷 ຮູບໜ້າປົກ</label>
+      <input type="file" id="cover-up" accept="image/*" style="display:none" onchange="upCover(this)">
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:8px;">
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar">${u.avatar_url?`<img src="${u.avatar_url}">`:(u.full_name||'?')[0].toUpperCase()}</div>
+        <label for="avatar-up" class="avatar-edit" style="cursor:pointer;">📷</label>
+        <input type="file" id="avatar-up" accept="image/*" style="display:none" onchange="upAvatar(this)">
+      </div>
+      <button onclick="editName()" style="padding:8px 16px;border:1.5px solid var(--primary);border-radius:20px;color:var(--primary);font-size:13px;font-weight:600;">✏️ ແກ້ໄຂ</button>
+    </div>
+    <div class="profile-name">${u.full_name||'ຜູ້ໃຊ້'}</div>
+    <div class="profile-email">${u.email||''}</div>
+    ${u.is_seller?'<span style="background:var(--success);color:white;padding:3px 12px;border-radius:12px;font-size:12px;font-weight:700;display:inline-block;margin-top:6px;">🏪 ຜູ້ຂາຍ</span>':''}
+    <div class="profile-stats">
+      <div class="pstat"><div class="pstat-val" id="ps-orders">-</div><div class="pstat-lab">ຄໍາສັ່ງ</div></div>
+      <div class="pstat"><div class="pstat-val">0</div><div class="pstat-lab">ລີວິວ</div></div>
+      <div class="pstat"><div class="pstat-val">0</div><div class="pstat-lab">ໂປດ</div></div>
+    </div>
+  </div>
+  <div class="wallet-card" onclick="openWallet()">
+    <div class="wallet-label">💳 ${t('wallet')}</div>
+    <div><span class="wallet-balance">${new Intl.NumberFormat('lo-LA').format(u.wallet_balance||0)}</span> <span style="font-size:16px;opacity:0.8;">ກີບ</span></div>
+    <div class="wallet-actions">
+      <button class="wallet-btn" onclick="event.stopPropagation();openTopup()">+ ເຕີມ</button>
+      <button class="wallet-btn" onclick="event.stopPropagation();openWallet()">ໂອນ</button>
+      <button class="wallet-btn" onclick="event.stopPropagation();openWallet()">ປະຫວັດ</button>
+    </div>
+  </div>
+  <div class="menu-list">
+    <div class="menu-item" onclick="openOrderPage()"><div class="menu-icon" style="background:#FFF3E0;">📦</div><div class="menu-text"><div class="menu-title">${t('orders')}</div><div class="menu-sub">ຕິດຕາມຄໍາສັ່ງ</div></div><span class="menu-arrow">›</span></div>
+    ${!u.is_seller?`<div class="menu-item" onclick="openSellerModal()"><div class="menu-icon" style="background:#E8F5E9;">🏪</div><div class="menu-text"><div class="menu-title">ສະໝັກ${t('seller')}</div><div class="menu-sub">ເລີ່ມຂາຍໄດ້ທັນທີ</div></div><span class="menu-arrow">›</span></div>`:`<div class="menu-item" onclick="toast('📊 Seller Dashboard')"><div class="menu-icon" style="background:#E8F5E9;">📊</div><div class="menu-text"><div class="menu-title">ຄວບຄຸມຮ້ານ</div></div><span class="menu-arrow">›</span></div>`}
+    <div class="menu-item" onclick="openTopup()"><div class="menu-icon" style="background:#E3F2FD;">💰</div><div class="menu-text"><div class="menu-title">ເຕີມເງິນ</div><div class="menu-sub">ສລິບທະນາຄານ</div></div><span class="menu-arrow">›</span></div>
+    <div class="menu-item" onclick="chgLang()"><div class="menu-icon" style="background:#F3E5F5;">🌐</div><div class="menu-text"><div class="menu-title">ພາສາ</div><div class="menu-sub">${lang==='lo'?'ລາວ':lang==='th'?'ไทย':'English'}</div></div><span class="menu-arrow">›</span></div>
+    <div class="menu-item" onclick="doLogout()"><div class="menu-icon" style="background:#FFEBEE;">🚪</div><div class="menu-text"><div class="menu-title" style="color:var(--danger);">ອອກຈາກລະບົບ</div></div><span class="menu-arrow" style="color:var(--danger);">›</span></div>
+  </div>`;
+  sbQ('orders',`?user_id=eq.${u.id}&select=id`).then(d=>{const el=document.getElementById('ps-orders');if(el)el.textContent=d.length||0;});
+}
+async function editName(){
+  const n=prompt('ຊື່ໃໝ່:',user.full_name||'');
+  if(!n||!n.trim())return;
+  user.full_name=n.trim();
+  await sbUpd('profiles',user.id,{full_name:user.full_name});
+  localStorage.setItem('kd_user',JSON.stringify(user));
+  renderProfile();toast('✅ ປ່ຽນຊື່ສໍາເລັດ');
+}
+async function upAvatar(input){
+  if(!input.files[0])return;
+  const url=await sbUpload('avatars','av_'+user.id+'_'+Date.now(),input.files[0]);
+  if(url){user.avatar_url=url;await sbUpd('profiles',user.id,{avatar_url:url});localStorage.setItem('kd_user',JSON.stringify(user));renderProfile();toast('✅ ປ່ຽນຮູບ');}
+  else toast('❌ ອັບໂຫລດໄດ້ຖ້າ Supabase Storage ເປີດ');
+}
+async function upCover(input){
+  if(!input.files[0])return;
+  const url=await sbUpload('covers','cv_'+user.id+'_'+Date.now(),input.files[0]);
+  if(url){user.cover_url=url;await sbUpd('profiles',user.id,{cover_url:url});localStorage.setItem('kd_user',JSON.stringify(user));renderProfile();toast('✅ ປ່ຽນໜ້າປົກ');}
+}
+function chgLang(){const ls=['lo','th','en'],ns=['ລາວ','ไทย','English'],i=ls.indexOf(lang);setLang(ls[(i+1)%3]);toast('🌐 '+ns[(i+1)%3]);}
+async function doLogout(){user=null;localStorage.removeItem('kd_user');renderProfile();toast('👋 ອອກຈາກລະບົບ');}
+
+// ── AUTH ──
+function openAuth(tab='login'){
+  document.getElementById('auth-content').innerHTML=`<div class="auth-title">🛒 ${theme.logo}</div><div class="auth-sub">ຊ້ອບໄດ້ທຸກທີ່ ທຸກເວລາ</div>
+  <div class="auth-tabs"><div class="auth-tab ${tab==='login'?'active':''}" onclick="showTab('login')">${t('login')}</div><div class="auth-tab ${tab==='reg'?'active':''}" onclick="showTab('reg')">${t('reg')}</div></div>
+  <div id="auth-form"></div>`;
+  showTab(tab);
+  document.getElementById('auth-modal').classList.add('open');
+}
+function showTab(tab){
+  document.querySelectorAll('.auth-tab').forEach((x,i)=>x.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='reg')));
+  const el=document.getElementById('auth-form');
+  if(tab==='login'){el.innerHTML=`<div class="form-group"><label class="form-label">Email</label><input class="form-input" id="a-email" type="email"></div><div class="form-group"><label class="form-label">ລະຫັດຜ່ານ</label><input class="form-input" id="a-pw" type="password"></div><button class="form-btn" onclick="doLogin()">${t('login')}</button>`;}
+  else{el.innerHTML=`<div id="s1"><div class="form-group"><label class="form-label">ຊື່ - ນາມສະກຸນ</label><input class="form-input" id="r-name"></div><div class="form-group"><label class="form-label">Email</label><input class="form-input" id="r-email" type="email"></div><div class="form-group"><label class="form-label">ລະຫັດ (≥6)</label><input class="form-input" id="r-pw" type="password"></div><div class="form-group"><label class="form-label">ເບີໂທ</label><input class="form-input" id="r-phone" type="tel"></div><button class="form-btn" onclick="sendOTP()">${t('reg')}</button></div>
+  <div id="s2" style="display:none"><div style="text-align:center;margin-bottom:16px;"><div style="font-size:40px;">📧</div><div style="font-size:16px;font-weight:700;margin:8px 0;">ກວດ OTP</div><div style="font-size:13px;color:var(--text3);">ລະຫັດ 6 ຕົວ</div></div>
+  <div class="otp-row">${[1,2,3,4,5,6].map(i=>`<input class="otp-input" id="o${i}" maxlength="1" oninput="if(this.value&&${i}<6)document.getElementById('o${i+1}').focus()" onkeydown="if(event.key==='Backspace'&&!this.value&&${i}>1)document.getElementById('o${i-1}').focus()">`).join('')}</div>
+  <button class="form-btn" onclick="verifyOTP()" style="margin-top:16px;">ຢືນຢັນ OTP</button>
+  <button onclick="showTab('reg')" style="width:100%;padding:10px;color:var(--text3);font-size:14px;margin-top:8px;">← ກັບ</button></div>`;}
+}
+function closeAuth(){document.getElementById('auth-modal').classList.remove('open');}
+async function sendOTP(){
+  const name=document.getElementById('r-name').value.trim();
+  const email=document.getElementById('r-email').value.trim();
+  const pw=document.getElementById('r-pw').value;
+  const phone=document.getElementById('r-phone').value.trim();
+  if(!name||!email||pw.length<6){toast('❗ ໃສ່ຂໍ້ມູນ (ລະຫັດ ≥6)');return;}
+  regData={name,email,pw,phone};
+  const res=await sbAuth('signup',email,pw);
+  if(res&&res.user){document.getElementById('s1').style.display='none';document.getElementById('s2').style.display='block';toast('📧 OTP ສົ່ງ!');}
+  else if(res&&res.error){toast('❌ '+(res.error.message||'ຜິດ'));}
+  else{document.getElementById('s1').style.display='none';document.getElementById('s2').style.display='block';toast('📧 Demo OTP ສົ່ງ!');}
+}
+async function verifyOTP(){
+  const otp=[1,2,3,4,5,6].map(i=>document.getElementById('o'+i).value).join('');
+  if(otp.length<6){toast('❗ ໃສ່ 6 ຕົວ');return;}
+  try{
+    const r=await fetch(SB+'/auth/v1/verify',{method:'POST',headers:{apikey:SK,'Content-Type':'application/json'},body:JSON.stringify({type:'signup',email:regData.email,token:otp})});
+    const d=await r.json();
+    if(d.user){await mkProfile(d.user.id,regData);finishReg(d.user.id);return;}
+  }catch(e){}
+  const uid='u_'+Date.now();await mkProfile(uid,regData);finishReg(uid);
+}
+async function mkProfile(uid,d){await sbIns('profiles',{id:uid,email:d.email,full_name:d.name,phone:d.phone,wallet_balance:0,is_seller:false,created_at:new Date().toISOString()});}
+function finishReg(uid){user={id:uid,email:regData.email,full_name:regData.name,phone:regData.phone,wallet_balance:0,is_seller:false};localStorage.setItem('kd_user',JSON.stringify(user));closeAuth();renderProfile();navTo('profile');toast('🎉 ສະໝັກສໍາເລັດ! ຍິນດີ '+regData.name);setTimeout(openSellerModal,1000);}
+async function doLogin(){
+  const email=document.getElementById('a-email').value.trim();
+  const pw=document.getElementById('a-pw').value;
+  if(!email||!pw){toast('❗ ໃສ່ Email / ລະຫັດ');return;}
+  const res=await sbAuth('token?grant_type=password',email,pw);
+  if(res&&res.user){
+    const p=await sbQ('profiles',`?id=eq.${res.user.id}&select=*`);
+    user=p[0]||{id:res.user.id,email,full_name:email.split('@')[0],wallet_balance:0};
+    localStorage.setItem('kd_user',JSON.stringify(user));closeAuth();renderProfile();navTo('profile');toast('👋 '+t('hi')+' '+(user.full_name||''));
+  }else{
+    user={id:'demo_'+Date.now(),email,full_name:email.split('@')[0],wallet_balance:500000,is_seller:false};
+    localStorage.setItem('kd_user',JSON.stringify(user));closeAuth();renderProfile();navTo('profile');toast('👋 Demo: '+user.full_name);
+  }
+}
+
+// ── WALLET ──
+function openWallet(){if(!user){openAuth();return;}renderWallet();document.getElementById('wallet-page').classList.add('open');}
+function closeWallet(){document.getElementById('wallet-page').classList.remove('open');}
+async function renderWallet(){
+  const p=await sbQ('profiles',`?id=eq.${user.id}&select=wallet_balance`);
+  const bal=(p[0]&&p[0].wallet_balance)||user.wallet_balance||0;
+  user.wallet_balance=bal;
+  const txns=await sbQ('transactions',`?user_id=eq.${user.id}&order=created_at.desc&limit=30`);
+  document.getElementById('wallet-content').innerHTML=`<div class="wallet-full">
+    <div style="font-size:14px;opacity:0.8;">ຍອດຄົງເຫລືອ</div>
+    <div><span class="wallet-bal-big">${new Intl.NumberFormat('lo-LA').format(bal)}</span> <span style="font-size:18px;opacity:0.75;">ກີບ</span></div>
+    <div class="wallet-actions-row">
+      <div class="w-action-btn" onclick="openTopup()"><div class="w-action-icon">+</div><div style="font-size:13px;font-weight:600;">ເຕີມ</div></div>
+      <div class="w-action-btn" onclick="doTransfer()"><div class="w-action-icon">↔</div><div style="font-size:13px;font-weight:600;">ໂອນ</div></div>
+      <div class="w-action-btn" onclick="doWithdraw()"><div class="w-action-icon">↑</div><div style="font-size:13px;font-weight:600;">ຖອນ</div></div>
+    </div>
+  </div>
+  <div class="txn-list"><div style="font-size:15px;font-weight:700;margin-bottom:12px;">ລາຍການ</div>
+  ${txns.length?txns.map(x=>`<div class="txn-item"><div class="txn-icon" style="background:${x.type==='in'?'rgba(0,200,83,0.1)':'rgba(244,67,54,0.1)'};">${x.type==='in'?'⬇️':'⬆️'}</div><div class="txn-info"><div class="txn-title">${x.description||''}</div><div class="txn-date">${x.created_at?new Date(x.created_at).toLocaleDateString('lo-LA'):''}</div></div><div class="txn-amount ${x.type}">${x.type==='in'?'+':'-'}${kip(x.amount||0)}</div></div>`).join(''):`<div class="empty-state" style="padding:40px 0;"><div class="empty-icon">💳</div><div class="empty-title">ຍັງບໍ່ມີລາຍການ</div></div>`}</div>`;
+}
+function doTransfer(){const to=prompt('Email ຜູ້ຮັບ:');if(!to)return;const amt=parseInt(prompt('ຈໍານວນ (ກີບ):'));if(!amt)return;if(amt>(user.wallet_balance||0)){toast('❌ ຍອດໄໝ່ພໍ');return;}toast('✅ ໂອນ '+kip(amt)+' → '+to+' (Demo)');}
+function doWithdraw(){if(!user.is_seller){toast('❌ ສໍາລັບຜູ້ຂາຍ');return;}const amt=parseInt(prompt('ຈໍານວນ:'));if(!amt)return;sbIns('withdraw_requests',{seller_id:user.id,seller_name:user.full_name,amount:amt,bank_info:'BCEL',status:'pending',created_at:new Date().toISOString()}).then(()=>toast('✅ ສົ່ງຄໍາຮ້ອງ ຮໍ 24ຊມ'));}
+
+// ── TOP-UP ──
+function openTopup(){if(!user){openAuth();return;}document.getElementById('bank-list').innerHTML=BANKS.map(b=>`<div class="bank-item" id="bk-${b.id}" onclick="pickBank('${b.id}')"><div class="bank-icon">${b.icon}</div><div class="bank-name">${b.name}</div></div>`).join('');document.getElementById('topup-modal').classList.add('open');}
+function closeTopup(){document.getElementById('topup-modal').classList.remove('open');}
+function pickBank(id){selBank=id;document.querySelectorAll('.bank-item').forEach(e=>e.classList.remove('selected'));document.getElementById('bk-'+id).classList.add('selected');}
+function previewSlip(input){if(!input.files[0])return;const r=new FileReader();r.onload=e=>{const p=document.getElementById('slip-preview');p.src=e.target.result;p.style.display='block';};r.readAsDataURL(input.files[0]);}
+async function submitTopup(){
+  const amt=parseInt(document.getElementById('topup-amount').value);
+  const f=document.getElementById('slip-file').files[0];
+  if(!selBank){toast('❗ ເລືອກທະນາຄານ');return;}
+  if(!amt||amt<10000){toast('❗ ຂັ້ນຕໍ່າ 10,000 ກີບ');return;}
+  if(!f){toast('❗ ອັບໂຫລດສລິບ');return;}
+  const slipUrl=await sbUpload('topup-slips','sl_'+user.id+'_'+Date.now(),f);
+  await sbIns('topup_requests',{user_id:user.id,user_name:user.full_name||user.email,bank:selBank,amount:amt,slip_url:slipUrl||null,status:'pending',created_at:new Date().toISOString()});
+  closeTopup();toast('✅ ສົ່ງຄໍາຮ້ອງ! ລໍຖ້າແອດມິນ');
+}
+
+// ── SELLER ──
+function openSellerModal(){if(!user)return;document.getElementById('seller-modal').classList.add('open');}
+function closeSellerModal(){document.getElementById('seller-modal').classList.remove('open');}
+async function submitSellerApp(){
+  const shop=document.getElementById('seller-shop-name').value.trim();
+  const ph=document.getElementById('seller-phone').value.trim();
+  if(!shop||!ph){toast('❗ ໃສ່ຂໍ້ມູນ');return;}
+  await sbIns('seller_applications',{user_id:user.id,shop_name:shop,phone:ph,address:document.getElementById('seller-address').value,bank_info:document.getElementById('seller-bank').value,status:'pending',created_at:new Date().toISOString()});
+  await sbUpd('profiles',user.id,{is_seller:true,shop_name:shop});
+  user.is_seller=true;localStorage.setItem('kd_user',JSON.stringify(user));
+  closeSellerModal();renderProfile();toast('🎉 ສະໝັກຜູ້ຂາຍ '+shop+' ສໍາເລັດ!');
+}
+
+// ── NOTIF ──
+function openNotif(){
+  document.getElementById('notif-list').innerHTML=NOTIFS.map(n=>`<div class="notif-item ${n.unread?'unread':''}" onclick="rdNotif(${n.id})"><div class="notif-icon-wrap" style="background:${n.bg}">${n.icon}</div><div style="flex:1;"><div class="notif-text">${n.text}</div><div class="notif-time">${n.time}</div></div>${n.unread?'<div class="unread-dot"></div>':''}</div>`).join('');
+  document.getElementById('notif-panel').classList.add('open');
+}
+function closeNotif(){document.getElementById('notif-panel').classList.remove('open');}
+function rdNotif(id){const n=NOTIFS.find(x=>x.id===id);if(n)n.unread=false;openNotif();updNotif();}
+function markAllRead(){NOTIFS.forEach(n=>n.unread=false);openNotif();updNotif();}
+function updNotif(){const c=NOTIFS.filter(n=>n.unread).length;const el=document.getElementById('notif-count');el.textContent=c;el.style.display=c>0?'flex':'none';}
+
+// ── SEARCH ──
+document.getElementById('header-search').addEventListener('input',function(){
+  const q=this.value.trim().toLowerCase();const el=document.getElementById('search-results');
+  if(!q){el.classList.remove('open');return;}
+  const f=[...products,...DEMO_PRODS].filter(p=>p.name.toLowerCase().includes(q)||(p.description&&p.description.toLowerCase().includes(q))).filter((p,i,a)=>a.findIndex(x=>x.id===p.id)===i).slice(0,8);
+  if(!f.length){el.classList.remove('open');return;}
+  el.innerHTML=f.map(p=>`<div class="search-result-item" onclick="document.getElementById('header-search').value='';document.getElementById('search-results').classList.remove('open');openProd(${p.id})"><div class="search-result-img">${p.image_url?`<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">`:p.emoji||'📦'}</div><div><div class="search-result-name">${p.name}</div><div class="search-result-price">${kip(p.price)}</div></div></div>`).join('');
+  el.classList.add('open');
+});
+document.addEventListener('click',e=>{if(!e.target.closest('#header-search')&&!e.target.closest('#search-results'))document.getElementById('search-results').classList.remove('open');});
+
+// ── BANNER ──
+function initBanner(){
+  const sl=document.getElementById('banner-slider');
+  const dots=document.querySelectorAll('.banner-dot');
+  let cur=0;
+  function go(i){cur=i;sl.scrollTo({left:i*sl.clientWidth,behavior:'smooth'});dots.forEach((d,j)=>d.classList.toggle('active',j===i));}
+  setInterval(()=>go((cur+1)%3),4000);
+  sl.addEventListener('scroll',()=>{const i=Math.round(sl.scrollLeft/sl.clientWidth);if(i!==cur){cur=i;dots.forEach((d,j)=>d.classList.toggle('active',j===i));}});
+}
+function scrollToFlash(){document.getElementById('flash-section').scrollIntoView({behavior:'smooth'});}
+
+// ── FLASH TIMER ──
+function initTimer(){
+  let s=2*3600+15*60+30;
+  setInterval(()=>{s=Math.max(0,s-1);const h=String(Math.floor(s/3600)).padStart(2,'0'),m=String(Math.floor((s%3600)/60)).padStart(2,'0'),sec=String(s%60).padStart(2,'0');['timer-h','timer-m','timer-s'].forEach((id,i)=>{const e=document.getElementById(id);if(e)e.textContent=[h,m,sec][i];});},1000);
+}
+
+// ── INIT ──
+async function init(){
+  const sv=localStorage.getItem('kd_user');if(sv)try{user=JSON.parse(sv);}catch(e){}
+  setLang(lang);
+  await loadSettings();
+  await loadCats();
+  await loadProds();
+  initBanner();initTimer();updNotif();saveCart();
+  setTimeout(()=>{
+    const sp=document.getElementById('splash');sp.style.opacity='0';
+    setTimeout(()=>{sp.style.display='none';document.getElementById('app').classList.add('active');},500);
+  },3000);
+}
+init();
+</script>
+</body>
+</html>
