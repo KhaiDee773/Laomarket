@@ -801,10 +801,21 @@ async function renderAdmin(tab){
         <button class="admin-btn admin-btn-primary" onclick="document.getElementById('splash-bg-file').click()" style="width:100%;margin-bottom:8px;">📷 ອັບໂຫລດຮູບພື້ນຫຼັງ Splash</button>
         <button onclick="clearSectionBg('splash_bg','splash-bg')" style="width:100%;padding:8px;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.5);border-radius:8px;font-size:12px;cursor:pointer;">🗑️ ລຶບຮູບ (ໃຊ້ Gradient)</button></div>
 
-        <div style="margin-bottom:12px;"><div style="color:rgba(255,255,255,0.7);font-size:12px;margin-bottom:6px;">✨ ໂລໂກ້ / ຊື່ແອດ</div>
-        <input class="admin-input" id="splash-logo-text" placeholder="ຊື່ຮ້ານ / ໂລໂກ້" value="${theme.logo||'ຂາຍດີ'}">
-        <div style="color:rgba(255,255,255,0.7);font-size:12px;margin-bottom:6px;">📝 ຂໍ້ຄວາມໃຕ້ໂລໂກ້</div>
-        <input class="admin-input" id="splash-sub-text" placeholder="ຂໍ້ຄວາມໃຕ້ໂລໂກ້" value="${theme.splashSub||'ຊື້ຂາຍອອນໄລນ໌ #1 ລາວ'}"></div>
+        <div style="margin-bottom:12px;">
+          <div style="color:rgba(255,215,0,0.9);font-size:13px;font-weight:700;margin-bottom:10px;">🖼️ ອັບໂຫລດຮູບໂລໂກ້</div>
+          <div id="splash-logo-img-preview" style="width:120px;height:120px;border-radius:50%;border:3px solid rgba(255,215,0,0.4);margin:0 auto 12px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.05);">
+            ${theme.splashLogoUrl?`<img src="${theme.splashLogoUrl}" style="width:100%;height:100%;object-fit:cover;">`:'<span style="font-size:36px;opacity:0.4;">🖼️</span>'}
+          </div>
+          <input type="file" id="splash-logo-file" accept="image/*" style="display:none" onchange="uploadSplashLogo(this)">
+          <button class="admin-btn admin-btn-primary" onclick="document.getElementById('splash-logo-file').click()" style="width:100%;margin-bottom:6px;">📷 ອັບໂຫລດຮູບໂລໂກ້ Splash</button>
+          <button onclick="clearSplashLogo()" style="width:100%;padding:8px;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.5);border-radius:8px;font-size:12px;cursor:pointer;margin-bottom:10px;">🗑️ ລຶບຮູບ (ໃຊ້ Emoji ແທນ)</button>
+          <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:10px;">
+          <div style="color:rgba(255,255,255,0.7);font-size:12px;margin-bottom:6px;">✏️ ຊື່ຮ້ານ (ສະແດງຖ້າບໍ່ມີຮູບ)</div>
+          <input class="admin-input" id="splash-logo-text" placeholder="ຊື່ຮ້ານ / ໂລໂກ້" value="${theme.logo||'ຂາຍດີ'}">
+          <div style="color:rgba(255,255,255,0.7);font-size:12px;margin-bottom:6px;">📝 ຂໍ້ຄວາມໃຕ້ໂລໂກ້</div>
+          <input class="admin-input" id="splash-sub-text" placeholder="ຂໍ້ຄວາມໃຕ້ໂລໂກ້" value="${theme.splashSub||'ຊື້ຂາຍອອນໄລນ໌ #1 ລາວ'}">
+          </div>
+        </div>
 
         <div style="margin-bottom:12px;"><div style="color:rgba(255,255,255,0.7);font-size:12px;margin-bottom:6px;">🏷️ ໄອຄອນຫຼັກ Splash</div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;">
@@ -1095,6 +1106,66 @@ function clearHeaderLogo(){
   toast('🗑️ ລຶບຮູບໂລໂກ້ Header');
 }
 
+/* ─── SPLASH LOGO IMAGE UPLOAD ─── */
+async function uploadSplashLogo(input){
+  if(!input.files[0])return;
+  const file=input.files[0];
+  // Validate size < 2MB
+  if(file.size>2*1024*1024){toast('❌ ຮູບໃຫຍ່ເກີນ 2MB');return;}
+  toast('⏳ ກໍາລັງອັບໂຫລດໂລໂກ້...');
+  const ext=file.name.split('.').pop().toLowerCase();
+  const path='logos/splash_logo_'+Date.now()+'.'+ext;
+  const url=await sbUpload('admin-assets',path,file);
+  if(url){
+    theme.splashLogoUrl=url;
+    // Update splash screen icon ring to show image
+    applySplashLogoImage(url);
+    // Save to Supabase
+    await sbIns('app_settings',{key:'splash_logo_url',value:url});
+    // Update preview in admin
+    const prev=document.getElementById('splash-logo-img-preview');
+    if(prev)prev.innerHTML=`<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+    toast('✅ ອັບໂຫລດໂລໂກ້ສຳເລັດ!');
+  }else{
+    toast('❌ ອັບໂຫລດບໍ່ໄດ້ — ກວດ Storage bucket');
+  }
+}
+
+function applySplashLogoImage(url){
+  // Replace emoji icon in splash ring with image
+  const ring=document.getElementById('splash-icon-ring');
+  if(ring){
+    ring.style.padding='0';
+    ring.style.overflow='hidden';
+    ring.innerHTML=`<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;position:relative;z-index:1;">`;
+  }
+  // Also update header logo
+  const headerLogo=document.getElementById('app-logo-text');
+  if(headerLogo && !theme.headerLogoUrl){
+    headerLogo.innerHTML=`<img src="${url}" style="height:34px;object-fit:contain;vertical-align:middle;border-radius:4px;">`;
+  }
+}
+
+function clearSplashLogo(){
+  theme.splashLogoUrl=null;
+  // Restore emoji icon
+  const ring=document.getElementById('splash-icon-ring');
+  if(ring){
+    ring.style.padding='';
+    ring.style.overflow='';
+    ring.innerHTML=`<span id="splash-main-icon" style="font-size:48px;position:relative;z-index:1;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5));">${theme.splashIcon||'🛍️'}</span>`;
+  }
+  // Restore header text
+  const headerLogo=document.getElementById('app-logo-text');
+  if(headerLogo && !theme.headerLogoUrl){
+    headerLogo.textContent=theme.logo||'ຂາຍດີ';
+  }
+  sbIns('app_settings',{key:'splash_logo_url',value:''}).catch(()=>{});
+  const prev=document.getElementById('splash-logo-img-preview');
+  if(prev)prev.innerHTML='<span style="font-size:36px;opacity:0.4;">🖼️</span>';
+  toast('🗑️ ລຶບຮູບໂລໂກ້ Splash');
+}
+
 /* ─── SECTION BACKGROUND UPLOAD ─── */
 async function uploadSectionBg(inputId,settingKey){
   const input=document.getElementById(inputId);
@@ -1325,6 +1396,7 @@ async function loadSettings(){
     if(s.key==='app_version'){theme.version=s.value;document.getElementById('version-tag').textContent=s.value;}
     if(s.key==='splash_icon'){theme.splashIcon=s.value;const si=document.getElementById('splash-main-icon');if(si)si.textContent=s.value;}
     if(s.key==='splash_sub'){theme.splashSub=s.value;const ss=document.getElementById('splash-logo-sub');if(ss)ss.textContent=s.value;}
+    if(s.key==='splash_logo_url'&&s.value){theme.splashLogoUrl=s.value;applySplashLogoImage(s.value);}
     if(s.key==='splash_bg'&&s.value){applySectionBg('splash_bg',s.value);}
     if(s.key==='splash_gradient'&&s.value){const el=document.getElementById('splash-bg');if(el)el.style.background=s.value;}
     if(s.key==='header_logo_url'&&s.value){let lel=document.getElementById('app-logo-text');if(lel)lel.innerHTML=`<img src="${s.value}" style="height:32px;object-fit:contain;vertical-align:middle;">`;}
